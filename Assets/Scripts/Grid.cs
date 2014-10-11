@@ -16,10 +16,10 @@ public class Grid
 	#region Variables (private)
 
     // Grilla de bloques
-    private Block[, ,] _grid = new Block[_GRIDSIZE_X, _GRIDSIZE_Y, _GRIDSIZE_Z];
+    private Block[, ,] _blocksGrid = new Block[_GRIDSIZE_X, _GRIDSIZE_Y, _GRIDSIZE_Z];
 
     // Diccionario para facilitar el acceso utilizando indices (independientemente de la posicion de los bloques)
-    private Dictionary<Block, IntVector3> _hashTable = new Dictionary<Block, IntVector3>(_GRIDSIZE_X * _GRIDSIZE_Y * _GRIDSIZE_Z);
+    private Dictionary<Block, IntVector3> _blocksHash = new Dictionary<Block, IntVector3>(_GRIDSIZE_X * _GRIDSIZE_Y * _GRIDSIZE_Z);
 
 	#endregion
 
@@ -29,7 +29,7 @@ public class Grid
     {
         get
         {
-            return OutOfGrid(new IntVector3(x, y, z)) ? null : _grid[x, y, z];
+            return OutOfGrid(new IntVector3(x, y, z)) ? null : _blocksGrid[x, y, z];
         }
     }
 
@@ -37,7 +37,7 @@ public class Grid
     {
         get
         {
-            return OutOfGrid(pos) ? null : _grid[pos.x, pos.y, pos.z];
+            return OutOfGrid(pos) ? null : _blocksGrid[pos.x, pos.y, pos.z];
         }
     }
 
@@ -45,7 +45,7 @@ public class Grid
     {
         get
         {
-            return _grid.Clone() as Block[, ,];
+            return _blocksGrid.Clone() as Block[, ,];
         }
     }
 
@@ -60,7 +60,7 @@ public class Grid
     /// <returns></returns>
     private Block GetAt(IntVector3 pos)
     {
-        return _grid[pos.x, pos.y, pos.z];
+        return _blocksGrid[pos.x, pos.y, pos.z];
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public class Grid
     /// <returns></returns>
     private void SetAt(IntVector3 pos, Block block)
     {
-        _grid[pos.x, pos.y, pos.z] = block;
+        _blocksGrid[pos.x, pos.y, pos.z] = block;
     }
     
     #endregion
@@ -88,7 +88,7 @@ public class Grid
         SetAt(block.position, block);
 
         // Lo almacena en la hashTable
-        _hashTable.Add(block, block.position);
+        _blocksHash.Add(block, block.position);
     }
 
     /// <summary>
@@ -99,7 +99,7 @@ public class Grid
     {
         // Vacia las entradas
         SetAt(block.position, null);
-        _hashTable.Remove(block);
+        _blocksHash.Remove(block);
     }
 
     /// <summary>
@@ -125,10 +125,10 @@ public class Grid
     public void Update(Block block)
     {
         // Si el bloque no existe sale
-        if (!_hashTable.ContainsKey(block)) throw new KeyNotFoundException();
+        if (!_blocksHash.ContainsKey(block)) throw new KeyNotFoundException();
 
         // Obtiene la antigua y nueva posicion
-        var from = _hashTable[block];
+        var from = _blocksHash[block];
         var to = block.position;
 
         // Si no hay un cambio de posicion, omite mover indices
@@ -139,7 +139,7 @@ public class Grid
                 RemoveBlock(GetAt(to));
 
             // Actualiza la hashtable
-            _hashTable[block] = to;
+            _blocksHash[block] = to;
         }
 
         // Actualiza la grilla
@@ -163,7 +163,7 @@ public class Grid
             RemoveBlock(GetAt(to));
 
         // Actualiza la hashtable
-        _hashTable[block] = to;
+        _blocksHash[block] = to;
 
         // Actualiza la grilla
         SetAt(from, null);
@@ -177,7 +177,7 @@ public class Grid
     /// <returns></returns>
     public IntVector3 IndexOf(Block block)
     {
-        return _hashTable[block];
+        return _blocksHash[block];
     }
     
     /// <summary>

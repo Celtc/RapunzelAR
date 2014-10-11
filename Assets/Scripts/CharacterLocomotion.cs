@@ -10,98 +10,50 @@ public class CharacterLocomotion : MonoBehaviour
 
     [SerializeField]
     private float _runSpeed = 3f;
+
     [SerializeField]
     private float _generalSpeed = 1f;
 
+    [SerializeField]
+    private List<ActionData> _actionsData;
+    private Dictionary<string, ActionData> _actionsHash;
+
     private State _state;
-    private Animator _animator;
     private CharacterInput _input;
-
-    #region Flags de animaciones
-
-    private bool standing = false;
-    private bool gripStanding = false;
-    private bool run = false;
-    private bool climb = false;
-    private bool jumpDown = false;
-    private bool push = false;
-    private bool pull = false;
-    private bool hangUp = false;
-    private bool hangDown = false;
-    private bool hangLeft = false;
-    private bool hangRight = false;
-    private bool hangAcuteLeft = false;
-    private bool hangAcuteRight = false;
-    private bool hangObtuseLeft = false;
-    private bool hangObtuseRight = false;
-
-    #endregion
-
-    #region Data de Acciones
-
-    [SerializeField]
-    private ActionData _turnLeft;
-    [SerializeField]
-    private ActionData _turnRight;
-    [SerializeField]
-    private ActionData _turnBack;
-    [SerializeField]
-    private ActionData _run;
-    [SerializeField]
-    private ActionData _climb;
-    [SerializeField]
-    private ActionData _jumpDown;
-    [SerializeField]
-    private ActionData _push;
-    [SerializeField]
-    private ActionData _pull;
-    [SerializeField]
-    private ActionData _hangUp;
-    [SerializeField]
-    private ActionData _hangDown;
-    [SerializeField]
-    private ActionData _hangLeft;
-    [SerializeField]
-    private ActionData _hangRight;
-    [SerializeField]
-    private ActionData _hangAcuteLeft;
-    [SerializeField]
-    private ActionData _hangAcuteRight;
-    [SerializeField]
-    private ActionData _hangObtuseLeft;
-    [SerializeField]
-    private ActionData _hangObtuseRight;
-
-    #endregion
-
+    private CharacterMecanimController _mecanim;
+    
     #endregion
 
     #region Properties (public)
 
-    public float generalSpeed
+    public float GeneralSpeed
     {
         get { return _generalSpeed; }
         set { _generalSpeed = value; }
     }
 
-    public float runSpeed
+    public float RunSpeed
     {
         get { return _runSpeed; }
         set { _runSpeed = value; }
     }
 
-    public IntVector3 position
+    public IntVector3 Position
     {
-        get { return transform.position; }
-        set { transform.position = new Vector3(value.x + .5f, value.y + .5f, value.z + .5f); }
+        get
+        {
+            return CustomMathf.RoundToIntVector(new Vector3(transform.position.x - .5f, transform.position.y, transform.position.z - .5f));
+        }
     }
 
-    public Vector3 exactPosition
+    public IntVector3 Direction
     {
-        get { return new Vector3(transform.position.x - .5f, transform.position.y, transform.position.z - .5f); }
-        private set { transform.position = new Vector3(value.x + .5f, value.y, value.z + .5f); }
+        get
+        {
+            return CustomMathf.RoundToIntVector(transform.forward);
+        }
     }
-    
+
     #endregion
 
     #region Unity event functions
@@ -111,21 +63,19 @@ public class CharacterLocomotion : MonoBehaviour
     /// </summary>
     void Start()
     {
-        _animator = GetComponent<Animator>();
-        _input = new CharacterInput(null, false, false);
+        _mecanim = GetComponent<CharacterMecanimController>();
+        _input = new CharacterInput();
+        GenerateHashes();
     }
 
     /// <summary>
     /// Update is called once per frame.
     /// </summary>
-    void LateUpdate()
+    void Update()
     {
         // En caso de que este inactivo, permite el comienzo de una nueva accion
         if (IsInactive())
             StartAction();
-
-        // Transmite a mecanim los flags de animacion
-        SetMecanimVars();
     }
 
     #endregion
@@ -133,47 +83,21 @@ public class CharacterLocomotion : MonoBehaviour
     #region Metodos privados
 
     /// <summary>
-    /// Reinicia los flags de animacion
+    /// Genera la hashtable (diccionario) de las acciones
     /// </summary>
-    private void ResetFlags()
-    {        
-        standing = false;
-        gripStanding = false;
-        run = false;
-        climb = false;
-        jumpDown = false;
-        push = false;
-        pull = false;
-        hangUp = false;
-        hangDown = false;
-        hangLeft = false;
-        hangRight = false;
-        hangAcuteLeft = false;
-        hangAcuteRight = false;
-        hangObtuseLeft = false;
-        hangObtuseRight = false;
-    }
-
-    /// <summary>
-    /// Transmite al animator los flags de animacion para moverse entre estados
-    /// </summary>
-    private void SetMecanimVars()
+    private void GenerateHashes()
     {
-        _animator.SetBool("Standing", standing);
-        _animator.SetBool("GripStanding", gripStanding);
-        _animator.SetBool("MoveFwd", run);
-        _animator.SetBool("Climb", climb);
-        _animator.SetBool("JumpDown", jumpDown);
-        _animator.SetBool("Push", push);
-        _animator.SetBool("Pull", pull);
-        _animator.SetBool("HangUp", hangUp);
-        _animator.SetBool("HangDown", hangDown);
-        _animator.SetBool("HangLeft", hangLeft);
-        _animator.SetBool("HangRight", hangRight);
-        _animator.SetBool("HangAcuteLeft", hangAcuteLeft);
-        _animator.SetBool("HangAcuteRight", hangAcuteRight);
-        _animator.SetBool("HangObtuseLeft", hangObtuseLeft);
-        _animator.SetBool("HangObtuseRight", hangObtuseRight);
+        if (_actionsHash == null)
+        {
+            _actionsHash = new Dictionary<string, ActionData>();
+        }
+
+        _actionsHash.Clear();
+
+        for (int i = 0; i < _actionsData.Count; i++)
+        {
+            _actionsHash.Add(_actionsData[i].Name, _actionsData[i]);
+        }
     }
 
     /// <summary>
@@ -182,56 +106,108 @@ public class CharacterLocomotion : MonoBehaviour
     /// </summary>
     private void StartAction()
     {
-        // Seteo inicial de variables
-        ResetFlags();
-
-        // Esta colgado?
+        // Esta colgado
         if (_state == State.Hanging)
         {
-            HangingManagement();
+            // Si no hay input
+            if (!_input.HasInput())
+            {
+                Hang();
+            }
+
+            // Hay input
+            else
+            {
+                HangingManagement();
+            }
         }
-        else
+
+        // Esta agarrando un bloque
+        else if (_state == State.Gripping)
+        {
+            // Si suelta el boton de agarre
+            if (!_input.BtnA)
+            {
+                Debug.Log("Accion: Soltando bloque (no hay input)");
+                ReleaseGrip();
+            }
+
+            // Hay input de boton de agarre (al menos)
+            else
+            {
+                GrippingManagement();
+            }
+        }
+
+        // Esta parado
+        else if (_state == State.Standing)
         {
             // Si no hay input
             if (!_input.HasInput())
             {
                 Stand();
             }
-            // Hay input del boton de agarre
-            else if (_input.BtnA)
-            {
-                GripManagement();
-            }
-            // Hay input de direccion unicamente
+
+            // Hay input
             else
             {
-                LocomotionManagement();
+                // Hay input de boton de agarre
+                if (_input.BtnA)
+                {
+                    GrippingManagement();
+                }
+
+                // Sigue estando parado
+                if (_state == State.Standing)
+                {
+                    // Hay input de direccion
+                    if (_input.Direction != null)
+                    {
+                        LocomotionManagement();
+                    }
+
+                    // No hay input de direccion
+                    else
+                    {
+                        // Se queda parado
+                        Stand();
+                    }
+                }
             }
         }
 
         // Borra el input almacenado
         _input.Empty();
     }
-    
-    private void GripManagement()
+
+    private void GrippingManagement()
     {
         // Determina la posicion objetivo
-        var frontPos = position + transform.forward;
+        var frontPos = Position + Direction;
 
         // Obtiene el cubo objetivo
-        var grippedBlock = Level.Grid[frontPos];
-        if (grippedBlock != null && !grippedBlock.isMoving)
+        var grippedBlock = Level.Grid.ExistsStillAt(frontPos) ? Level.Grid[frontPos] : null;
+
+        // Si no estaba agarrando un bloque (estaba parado)
+        if (_state != State.Gripping)
         {
-            // Esta agarrando un bloque?
-            if (_state != State.GripStanding)
+            // Hay bloque => Agarra
+            if (grippedBlock != null)
             {
-                Debug.Log("Accion: Agarrando Bloque");
+                Debug.Log("Accion: Agarrando bloque");
                 Grip();
             }
-            else if (_input.Direction != null)
+        }
+
+        // Estaba agarrando un bloque y hay que bloque que agarrar
+        else if (grippedBlock != null)
+        {
+            // Hay input de movimiento
+            if (_input.Direction != null)
             {
+                
                 // Empuja hacia el bloque
-                if (_input.Direction == transform.forward)
+                if (_input.Direction == Direction)
                 {
                     // Empuja
                     Debug.Log("Accion: Empujando");
@@ -239,51 +215,57 @@ public class CharacterLocomotion : MonoBehaviour
                 }
 
                 // Tira del bloque
-                else if (_input.Direction == transform.forward * -1f)
+                else if (_input.Direction == Direction * -1f)
                 {
                     // Tira
                     Debug.Log("Accion: Tirando");
                     Pull(grippedBlock);
-                }                
+                }
             }
-            // No hace nada
+
+            // No hay input de movimiento
             else
             {
-                // Vuelve a la animacion de gripStand
-                gripStanding = true;
+                // Se queda agarrando el bloque
+                Grip();
             }
         }
+
+        // Estaba agarrando un bloque pero NO hay bloque que agarrar
         else
         {
-            // Si no hay bloque que agarrar se queda parado
-            Stand();
+            Debug.Log("Accion: Soltando bloque (sin bloque que agarrar)");
+            ReleaseGrip();
         }
     }
-    
+
     private void HangingManagement()
     {
-        // Si no hay input
-        if (!_input.HasInput())
+        // Hay input del boton de agarre
+        if (_input.BtnA)
         {
             Hang();
-        }
-        // Hay input del boton de agarre
-        else if (_input.BtnA)
-        {
         }
         // Hay input de direccion unicamente
         else
         {
-            // Transforma el input (da prioridad al input vertical)           
-            var newInput = new Vector3(0, _input.Direction.z > 0 ? 1 : 0, 0);
-            if (newInput.y == 0)
-                newInput += transform.rotation * new Vector3(_input.Direction.x, 0, 0);
+            // Transforma el input (da prioridad al input vertical)    
+            var newInput = new Vector3(0, _input.Direction.z, 0);
+            if (newInput.y == 0 && _input.Direction.x != 0)
+            {
+                if (_input.Direction.x > 0)
+                    newInput += transform.right;
+                else
+                    newInput += (transform.right * -1f);
+            }
 
             // Determina la posicion objetivo
-            var targetPos = position + newInput;
+            var targetPos = Position + newInput;
+            //Debug.Log(Position);
+            //Debug.Log(targetPos);
 
             // Desplazamiento horizontal
-            if (newInput.y == 0)
+            if (newInput.y == 0 && newInput.x != 0)
             {
                 // Hay un cubo en el lugar destino? -> Dobla (Acute)
                 if (Level.Grid.ExistsStillAt(targetPos))
@@ -291,18 +273,18 @@ public class CharacterLocomotion : MonoBehaviour
                     // Direccion de strafe
                     if (_input.Direction.x > 0)
                     {
-                        Debug.Log("Accion: Colgando -> Dobla Agudo Derecha");
-                        HangAcuteRight();
+                        Debug.Log("Accion: Colgando -> Giro Derecha Concavo");
+                        HangRightConcave();
                     }
                     else
                     {
-                        Debug.Log("Accion: Colgando -> Dobla Agudo Izquierda");
-                        HangAcuteLeft();
+                        Debug.Log("Accion: Colgando -> Giro Izquierda Concavo");
+                        HangLeftConcave();
                     }
                 }
 
                 // Hay un cubo delante del lugar destino?
-                else if (Level.Grid.ExistsStillAt(targetPos + transform.forward))
+                else if (Level.Grid.ExistsStillAt(targetPos + Direction))
                 {
                     // Direccion de strafe
                     if (_input.Direction.x > 0)
@@ -321,27 +303,31 @@ public class CharacterLocomotion : MonoBehaviour
                 else
                 {
                     if (_input.Direction.x > 0 &&
-                        !Level.Grid.ExistsStillAt(targetPos + transform.forward + Vector3.up))
+                        !Level.Grid.ExistsStillAt(targetPos + Direction + Vector3.up))
                     {
-                        Debug.Log("Accion: Colgando -> Dobla Grave Derecha");
-                        HangObtuseRight();
+                        Debug.Log("Accion: Colgando -> Giro Derecha Convexo");
+                        HangRightConvexe();
                     }
-                    else if (!Level.Grid.ExistsStillAt(targetPos + transform.forward + Vector3.up))
+                    else if (!Level.Grid.ExistsStillAt(targetPos + Direction + Vector3.up))
                     {
-                        Debug.Log("Accion: Colgando -> Dobla Grave Izquierda");
-                        HangObtuseLeft();
+                        Debug.Log("Accion: Colgando -> Giro Izquierda Convexo");
+                        HangLeftConvexe();
                     }
 
                 }
             }
 
             // Desplazamiento vertical
-            else if (newInput.y > 0)
+            else if (newInput.y == 1)
             {
-                if (!Level.Grid.ExistsStillAt(targetPos + transform.forward))
+                if (!Level.Grid.ExistsStillAt(targetPos + Direction))
                 {
                     Debug.Log("Accion: Colgando -> Subir");
                     HangUp();
+                }
+                else
+                {
+                    Hang();
                 }
             }
         }
@@ -350,23 +336,23 @@ public class CharacterLocomotion : MonoBehaviour
     private void LocomotionManagement()
     {
         // Si no esta orientado, gira
-        if (transform.forward != _input.Direction)
+        if (Direction != _input.Direction)
         {
-            Debug.Log("Accion: Girando");
+            Debug.Log("Accion: Girando (" + _input.Direction + ")");
             Turn(_input.Direction);
             return;
         }
 
         // Determina la posicion objetivo
-        var targetPos = position + transform.forward;
-
+        var targetPos = Position + Direction;
+        
         // Hay un cubo en el lugar destino?
         if (Level.Grid.ExistsAt(targetPos))
         {
             // El cubo a trepar no esta quieto o hay un cubos que impidan trepar? (arriba nuestro o arriba del cubo a trepar)
             if (Level.Grid.ExistsStillAt(targetPos) &&
                 !Level.Grid.ExistsStillAt(targetPos + Vector3.up) &&
-                !Level.Grid.ExistsStillAt(position + Vector3.up))
+                !Level.Grid.ExistsStillAt(Position + Vector3.up))
             {
                 // Trepa
                 Debug.Log("Accion: Trepando");
@@ -409,22 +395,25 @@ public class CharacterLocomotion : MonoBehaviour
     /// <returns></returns>
     private IEnumerator DoAction(ActionData action, State newState, State endState, float speedFactor, Action afterAction = null)
     {
-        // Cambio al nuevo estado
+        // Cambio al nuevo estado y establece el root motion
         _state = newState;
+        _mecanim.ApplyRootMotion(action.RootMotion);
 
         // Almacena valores iniciales
         var elapsedTime = -Time.deltaTime;
-        var startPosition = exactPosition;
+        var startPosition = transform.position;
         var startRotation = transform.rotation;
-        var actionDuration = action.baseDuration / speedFactor;
+        var actionDuration = action.duration / speedFactor;
 
         // Flags de presencia de curvas
         var hasDeltaX = action.deltaX.keys.Length > 0;
         var hasDeltaY = action.deltaY.keys.Length > 0;
         var hasDeltaZ = action.deltaZ.keys.Length > 0;
         var hasDeltaR = action.deltaR.keys.Length > 0;
-        
+
         // A lo largo de la duracion de la accion aplica las tranformaciones
+        var deltaRotation = 0f;
+        var deltaPosition = Vector3.zero;
         while (elapsedTime < actionDuration)
         {
             // Incrementa el tiempo
@@ -432,22 +421,34 @@ public class CharacterLocomotion : MonoBehaviour
 
             // Porcentaje [0,1] de progreso de la accion
             var fraction = Mathf.Clamp01(elapsedTime / actionDuration);
-            Debug.Log(fraction);
+            //Debug.Log(fraction);
 
             #region Posicion
 
-            // Crea el vector delta
-            var deltaPosition = new Vector3(
+            // Obtiene el nuevo delta
+            var currDeltaPosition = new Vector3(
                 hasDeltaX ? action.deltaX.Evaluate(fraction) : 0f,
                 hasDeltaY ? action.deltaY.Evaluate(fraction) : 0f,
                 hasDeltaZ ? action.deltaZ.Evaluate(fraction) : 0f
             );
-            
-            // Lo orienta
-            deltaPosition = startRotation * deltaPosition;
 
-            // Modifica la posicion
-            exactPosition = startPosition + deltaPosition;
+            // Lo orienta
+            currDeltaPosition = startRotation * currDeltaPosition;
+
+            // Si es el ultimo frame de accion el posicionamiento es absoluto, sino relativo
+            if (fraction == 1f)
+            {
+                // Modifica la posicion
+                transform.position = startPosition + currDeltaPosition;
+            }
+            else
+            {
+                // Modifica la posicion
+                transform.position += currDeltaPosition - deltaPosition;
+
+                // Guarda el delta actual
+                deltaPosition = currDeltaPosition;
+            }
 
             #endregion
 
@@ -455,60 +456,93 @@ public class CharacterLocomotion : MonoBehaviour
 
             if (hasDeltaR)
             {
-                var deltaRotation = action.deltaR.Evaluate(fraction);
-                transform.rotation = startRotation * Quaternion.Euler(0f, deltaRotation, 0f);
+                // Obtiene el nuevo delta
+                var currDeltaRotation = action.deltaR.Evaluate(fraction);
+
+                // Si es el ultimo frame de accion la rotacion es absoluta, sino relativa
+                if (fraction == 1f)
+                {
+                    transform.rotation = startRotation * Quaternion.Euler(0f, currDeltaRotation, 0f);
+                }
+                else
+                {
+                    transform.rotation = transform.rotation * Quaternion.Euler(0f, currDeltaRotation - deltaRotation, 0f);
+                    deltaRotation = currDeltaRotation;
+                }
             }
 
             #endregion
-            
-            // Espera al siguiente frame
-            yield return 0;
+
+            // Espera al siguiente frame, solo si no termino la accion
+            if (fraction != 1f) yield return 0;
         }
 
         // Ejecuta la accion si la hay
         if (afterAction != null)
             afterAction();
 
-        // Cambia al estado en que queda luego de la accion
+        // Cambia al estado en que queda luego de la accion y desactiva el rootMotion
         _state = endState;
-    }
-
-    /// <summary>
-    /// Determina si el character esta inactivo y podra realizar acciones
-    /// </summary>
-    /// <returns></returns>
-    private bool IsInactive()
-    {
-        return _state == State.Standing || _state == State.Hanging || _state == State.GripStanding;
+        _mecanim.ApplyRootMotion(false);
     }
 
     #region Acciones
 
     private void Stand()
     {
-        standing = true;
+        // Nuevo estado
         _state = State.Standing;
+
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("Standing");
+        _mecanim.SetSpeed(_generalSpeed);
     }
 
     private void Hang()
     {
+        // Nuevo estado
         _state = State.Hanging;
+
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("Hanging");
+        _mecanim.SetSpeed(_generalSpeed);
+    }
+
+    private void Grip()
+    {
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("Gripping");
+        _mecanim.SetSpeed(_generalSpeed);
+
+        // Inicia la rutina de la accion
+        StartCoroutine(DoAction(new ActionData("Gripping", .15f), State.Moving, State.Gripping, _generalSpeed));
+    }
+
+    private void ReleaseGrip()
+    {
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("Standing");
+        _mecanim.SetSpeed(_generalSpeed);
+
+        // Inicia la rutina de la accion
+        StartCoroutine(DoAction(new ActionData("ReleaseGripping", .15f), State.Moving, State.Standing, _generalSpeed));
     }
 
     private void Turn(Vector3 forward)
     {
-        // Establece la velocidad de mecanim
-        _animator.speed = _generalSpeed;
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("Standing");
+        _mecanim.SetSpeed(_generalSpeed);
 
-        // Activa el flag de animacion "Standing" (no hay animación para turning)
-        standing = true;
-
-        // Determina el tipo de giro (izq, derecha, 180)
+        // Determina el tipo de giro (izq, derecha, atras)
         ActionData actionData;
-        if (forward == transform.forward * -1)
-            actionData = _turnBack;
+        var angle = Mathf.Round(Vector3.Angle(Direction, forward));
+        if (angle == 180f)
+            actionData = _actionsHash["TurnBack"];
+        else if (Vector3.Cross(forward, Direction).y > 0)
+            actionData = _actionsHash["TurnLeft"];
         else
-            actionData = (Vector3.Cross(forward, transform.forward).y > 0) ? _turnLeft : _turnRight;
+            actionData = _actionsHash["TurnRight"];
 
         // Inicia la rutina de la accion
         StartCoroutine(DoAction(actionData, State.Moving, State.Standing, _generalSpeed));
@@ -516,204 +550,160 @@ public class CharacterLocomotion : MonoBehaviour
 
     private void Run()
     {
-        // La velocidad deseada se divide por el scale, para compensar la diferencia de tamaño del modelo
-        var blendFactor = _runSpeed / transform.localScale.x;
+        // Confugiracion de mecanim
+        _mecanim.SetSpeed(1f);
+        _mecanim.SetFlag("Run");
+        _mecanim.SetFloat("RunSpeed", _runSpeed / transform.localScale.x);
 
-        // Como la velocidad varia utilizando diferentes animaciones la velocidad 
-        // de Mecanim se mantiene en la original: 1, y cambia el float de blend de animaciones
-        _animator.speed = 1f;
-        _animator.SetFloat("RunSpeed", blendFactor);
-
-        // Establece el flag de estado run
-        run = true;      
-        
         // Inicia la rutina de la accion. Se le indica que una vez finalizada la tarea vuelva a la velocidad general
-        StartCoroutine(DoAction(_run, State.Moving, State.Standing, _runSpeed, delegate { _animator.speed = _generalSpeed; }));
+        StartCoroutine(DoAction(_actionsHash["Run"], State.Moving, State.Standing, _runSpeed, delegate { _mecanim.SetSpeed(_generalSpeed); }));
     }
 
     private void Climb()
     {
-        // Establece la velocidad de mecanim
-        _animator.speed = _generalSpeed;
-
-        // Activa el flag de animacion "Climb"
-        climb = true;
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("Climb");
+        _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_climb, State.Moving, State.Standing, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["Climb"], State.Moving, State.Standing, _generalSpeed));
     }
 
     private void JumpDown()
     {
-        // Establece la velocidad de mecanim
-        _animator.speed = _generalSpeed;
-
-        // Activa el flag de animacion "JumpDown"
-        jumpDown = true;
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("JumpDown");
+        _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_jumpDown, State.Moving, State.Standing, _generalSpeed));
-    }
-
-    private void Grip()
-    {
-        // Establece la velocidad de mecanim
-        _animator.speed = _generalSpeed;
-
-        // Activa el flag de animacion "GripStance"
-        gripStanding = true;
-
-        // Inicia la rutina de la accion
-        StartCoroutine(DoAction(new ActionData(.25f), State.Moving, State.GripStanding, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["JumpDown"], State.Moving, State.Standing, _generalSpeed));
     }
 
     private void Push(Block block)
     {
         // Comunica al bloque la instruccion de "Push" y le devuelve el tiempo que demora la accion
-        var duration = block.Pushed(position);
+        var duration = block.Pushed(Position);
 
         // Si es NaN el bloque es inamovible
         if (float.IsNaN(duration)) return;
-        
-        // Establece la velocidad de mecanim
-        var actionSpeed = 1 / duration;
-        _animator.speed = actionSpeed;
-
-        // Activa el flag de animacion "Push"
-        push = true;
 
         // Inicia la rutina de la accion. Se le indica que una vez finalizada la tarea vuelva a la velocidad general
-        StartCoroutine(PushSubRoutine(actionSpeed));
+        StartCoroutine(_Push(1 / duration));
     }
 
-    private IEnumerator PushSubRoutine(float actionSpeed)
+    private IEnumerator _Push(float actionSpeed)
     {
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("Push");
+        _mecanim.SetSpeed(actionSpeed);
+
         // Realiza la accion
-        yield return StartCoroutine(DoAction(_push, State.Moving, State.Moving, actionSpeed, delegate { _animator.speed = _generalSpeed; }));
+        yield return StartCoroutine(DoAction(_actionsHash["Push"], State.Moving, State.Moving, actionSpeed));
 
-        // Establece el flag de animacion en standing
-        standing = true;
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("Standing");
+        _mecanim.SetSpeed(_generalSpeed);
 
-        // Espera a que termine la transicion antes de setear el estado en standing
+        // Espera a que termine la transicion antes de setear el estado final
         yield return new WaitForSeconds(0.2f);
-
-        // Establece el estado en standing para habilitar nuevas acciones
         _state = State.Standing;
     }
 
     private void Pull(Block block)
     {
         // Comunica al bloque la instruccion de "Pull" y le devuelve el tiempo que demora la accion
-        var duration = block.Pulled(position);
+        var duration = block.Pulled(Position);
 
         // Si es NaN el bloque es inamovible
         if (float.IsNaN(duration)) return;
-        
-        // Establece la velocidad de mecanim
-        var actionSpeed = 1 / duration;
-        _animator.speed = actionSpeed;
 
-        // Activa el flag de animacion "Pull"
-        pull = true;
+        // Confugiracion de mecanim
+        var actionSpeed = 1 / duration;
+        _mecanim.SetFlag("Pull");
+        _mecanim.SetSpeed(actionSpeed);
 
         // Inicia la rutina de la accion. Se le indica que una vez finalizada la tarea vuelva a la velocidad general
-        StartCoroutine(DoAction(_pull, State.Moving, State.GripStanding, actionSpeed, delegate { _animator.speed = _generalSpeed; }));
+        StartCoroutine(DoAction(_actionsHash["Pull"], State.Moving, State.Gripping, actionSpeed, delegate { _mecanim.SetSpeed(_generalSpeed); }));
     }
 
     private void HangUp()
     {
-        // Establece la velocidad de mecanim
-        _animator.speed = _generalSpeed;
-
-        // Activa el flag de animacion "JumpDown"
-        hangUp = true;
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("HangUp");
+        _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_hangUp, State.Moving, State.Standing, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangUp"], State.Moving, State.Standing, _generalSpeed));
     }
 
     private void HangDown()
     {
-        // Establece la velocidad de mecanim
-        _animator.speed = _generalSpeed;
-
-        // Activa el flag de animacion "JumpDown"
-        hangDown = true;
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("HangDown");
+        _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_hangDown, State.Moving, State.Hanging, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangDown"], State.Moving, State.Hanging, _generalSpeed));
     }
 
     private void HangLeft()
     {
-        // Establece la velocidad de mecanim
-        _animator.speed = _generalSpeed;
-
-        // Activa el flag de animacion "JumpDown"
-        hangLeft = true;
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("HangLeft");
+        _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_hangLeft, State.Moving, State.Hanging, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangLeft"], State.Moving, State.Hanging, _generalSpeed));
     }
 
     private void HangRight()
     {
-        // Establece la velocidad de mecanim
-        _animator.speed = _generalSpeed;
-
-        // Activa el flag de animacion "JumpDown"
-        hangRight = true;
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("HangRight");
+        _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_hangRight, State.Moving, State.Hanging, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangRight"], State.Moving, State.Hanging, _generalSpeed));
     }
 
-    private void HangAcuteLeft()
+    private void HangLeftConcave()
     {
-        // Establece la velocidad de mecanim
-        _animator.speed = _generalSpeed;
-
-        // Activa el flag de animacion "JumpDown"
-        hangAcuteLeft = true;
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("HangLeftConcave");
+        _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_hangAcuteLeft, State.Moving, State.Hanging, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangLeftConcave"], State.Moving, State.Hanging, _generalSpeed));
     }
 
-    private void HangAcuteRight()
+    private void HangRightConcave()
     {
-        // Establece la velocidad de mecanim
-        _animator.speed = _generalSpeed;
-
-        // Activa el flag de animacion "JumpDown"
-        hangAcuteRight = true;
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("HangRightConcave");
+        _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_hangAcuteRight, State.Moving, State.Hanging, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangRightConcave"], State.Moving, State.Hanging, _generalSpeed));
     }
 
-    private void HangObtuseLeft()
+    private void HangLeftConvexe()
     {
-        // Establece la velocidad de mecanim
-        _animator.speed = _generalSpeed;
-
-        // Activa el flag de animacion "JumpDown"
-        hangObtuseLeft = true;
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("HangLeftConvexe");
+        _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_hangObtuseLeft, State.Moving, State.Hanging, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangLeftConvexe"], State.Moving, State.Hanging, _generalSpeed));
     }
 
-    private void HangObtuseRight()
+    private void HangRightConvexe()
     {
-        // Establece la velocidad de mecanim
-        _animator.speed = _generalSpeed;
-
-        // Activa el flag de animacion "JumpDown"
-        hangObtuseRight = true;
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("HangRightConvexe");
+        _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_hangObtuseRight, State.Moving, State.Hanging, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangRightConvexe"], State.Moving, State.Hanging, _generalSpeed));
     }
 
     #endregion
@@ -722,6 +712,19 @@ public class CharacterLocomotion : MonoBehaviour
 
     #region Metodos publicos
 
+    /// <summary>
+    /// Determina si el character esta inactivo y podra realizar acciones
+    /// </summary>
+    /// <returns></returns>
+    public bool IsInactive()
+    {
+        return _state == State.Standing || _state == State.Hanging || _state == State.Gripping;
+    }
+
+    /// <summary>
+    /// Establece el input que determinara el accionar del character
+    /// </summary>
+    /// <param name="input">Input</param>
     public void SetInput(CharacterInput input)
     {
         this._input = input;
@@ -732,7 +735,7 @@ public class CharacterLocomotion : MonoBehaviour
     enum State
     {
         Standing,
-        GripStanding,
+        Gripping,
         Hanging,
         Moving,
         Falling

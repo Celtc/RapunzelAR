@@ -39,6 +39,16 @@ public class IntVector3
     {
         return "(" + _x.ToString() + ", " + _y.ToString() + ", " + _z.ToString() + ")";
     }
+    
+    public static IntVector3 operator *(float f, IntVector3 v)
+    {
+        return new IntVector3((int)(v.x * f), (int)(v.y * f), (int)(v.z * f));
+    }
+
+    public static IntVector3 operator *(IntVector3 v, float f)
+    {
+        return new IntVector3((int)(v.x * f), (int)(v.y * f), (int)(v.z * f));
+    }
 
     public static IntVector3 operator -(IntVector3 v1, IntVector3 v2)
     {
@@ -85,6 +95,28 @@ public class IntVector3
         return vector.ToString();
     }
     
+    public static bool operator !=(IntVector3 v1, IntVector3 v2)
+    {
+        return !(v1 == v2);
+    }
+
+    public static bool operator ==(IntVector3 v1, IntVector3 v2)
+    {
+        if (object.ReferenceEquals(v1, null))
+        {
+            return object.ReferenceEquals(v2, null);
+        }
+
+        return v1.Equals(v2);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj == null) return false;
+        var v = (IntVector3)obj;
+        return this.x == v.x && this.y == v.y && this.z == v.z;
+    }
+
     public static IntVector3 zero { get { return new IntVector3(0, 0, 0); } }
 
     #endregion

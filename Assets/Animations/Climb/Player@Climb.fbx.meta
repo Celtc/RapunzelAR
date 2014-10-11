@@ -340,12 +340,38 @@ ModelImporter:
       loopBlendPositionY: 0
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 0
-      keepOriginalPositionY: 1
+      keepOriginalPositionY: 0
       keepOriginalPositionXZ: 0
-      heightFromFeet: 0
+      heightFromFeet: 1
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves: []
+      curves:
+      - name: AvgSpeedZ
+        curve:
+          serializedVersion: 2
+          curve:
+          - time: .00200601807
+            value: 1.01512432
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+          - time: .318956852
+            value: 1.04970145
+            inSlope: 0
+            outSlope: 0
+            tangentMode: 0
+          - time: .907972395
+            value: 1.05010283
+            inSlope: -.0143051147
+            outSlope: -.0143051147
+            tangentMode: 0
+          - time: .998999
+            value: 1.0265671
+            inSlope: -.0943394527
+            outSlope: -.0943394527
+            tangentMode: 0
+          preInfinity: 2
+          postInfinity: 2
       events: []
       transformMask:
       - path: 

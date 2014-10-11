@@ -36,6 +36,12 @@ public class CharacterInput
     
 	#region Metodos
 
+    public CharacterInput()
+    {
+        this._btnA = this._btnB = false;
+        this._direction = null;
+    }
+
     public CharacterInput(IntVector3 direction, bool btnA, bool btnB)
     {
         this._btnA = btnA;

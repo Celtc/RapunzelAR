@@ -7,7 +7,9 @@ public class ActionData
     #region Variables (private)
 
     [SerializeField]
-    private float _baseDuration;
+    private string _name;
+    [SerializeField]
+    private float _duration;
     [SerializeField]
     private AnimationCurve _deltaX;
     [SerializeField]
@@ -16,17 +18,21 @@ public class ActionData
     private AnimationCurve _deltaZ;
     [SerializeField]
     private AnimationCurve _deltaR;
+    [SerializeField]
+    private bool _rootMotion;
 
     #endregion
 
     #region Properties (public)
 
-    public float baseDuration { get { return _baseDuration; } }
+    public string Name { get { return _name; } }
+    public float duration { get { return _duration; } }
     public AnimationCurve deltaX { get { return _deltaX; } }
     public AnimationCurve deltaY { get { return _deltaY; } }
     public AnimationCurve deltaZ { get { return _deltaZ; } }
     public AnimationCurve deltaR { get { return _deltaR; } }
-    
+    public bool RootMotion { get { return _rootMotion; } }
+
     #endregion
 
     #region Metodos privados
@@ -42,12 +48,14 @@ public class ActionData
     #endregion
 
     #region Metodos publicos
-
-    public ActionData(float baseDuration)
-    {
-        this._baseDuration = baseDuration;
-        this._deltaX = this._deltaY = this._deltaZ = this._deltaR = EmptyCurve();
-    }
     
+    public ActionData(string name, float duration)
+    {
+        this._name = name;
+        this._duration = duration;
+        this._deltaX = this._deltaY = this._deltaZ = this._deltaR = EmptyCurve();
+        this._rootMotion = false;
+    }
+
     #endregion
 }

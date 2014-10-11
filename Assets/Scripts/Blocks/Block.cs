@@ -179,11 +179,8 @@ public class Block : MonoBehaviour
 
         // Variables temporales
         var fraction = 0f;
-        var elapsedTime = 0f;
-
-        // Comienza al sig. frame
-        yield return 0;
-
+        var elapsedTime = -Time.deltaTime;
+        
         // Mientras que el tiempo sea menor a la duracion
         while (elapsedTime < duration)
         {
@@ -194,8 +191,8 @@ public class Block : MonoBehaviour
             fraction = Mathf.Clamp01(elapsedTime / duration);
             exactPosition = Vector3.Lerp(from, to, fraction);
 
-            // Espera al siguiente frame
-            yield return 0;
+            // Espera al siguiente frame (solo si no termino de moverse)
+            if (fraction < 1f) yield return 0;
         }
 
         // Ejecuta la accion si la hay
