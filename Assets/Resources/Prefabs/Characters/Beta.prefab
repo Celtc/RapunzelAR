@@ -1062,6 +1062,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 400140}
   - 95: {fileID: 9500000}
+  - 114: {fileID: 11400004}
   - 114: {fileID: 11400002}
   - 114: {fileID: 11400000}
   m_Layer: 0
@@ -1915,8 +1916,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100140}
-  m_LocalRotation: {x: -0, y: .715422034, z: -0, w: .69869262}
-  m_LocalPosition: {x: 9.32134819, y: 1, z: 8.40790653}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: .550000012, y: .550000012, z: .550000012}
   m_Children:
   - {fileID: 400138}
@@ -1932,8 +1933,8 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: a18d2ff18eb59494191986786d0edbca, type: 3}
   m_Controller: {fileID: 9100000, guid: 1ac2a1891f6a2814dbcb83cbd24d5ee1, type: 2}
-  m_CullingMode: 1
-  m_ApplyRootMotion: 0
+  m_CullingMode: 0
+  m_ApplyRootMotion: 1
   m_AnimatePhysics: 0
   m_HasTransformHierarchy: 1
 --- !u!114 &11400000
@@ -1958,25 +1959,95 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8163bb48caee6b545b35c5456ee83ee5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _runSpeed: 3.20000005
+  _runSpeed: 3
   _generalSpeed: 1.60000002
-  _turnLeft:
-    _baseDuration: .100000001
+  _actionsData:
+  - _name: Standing
+    _duration: 0
     _deltaX:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaY:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaZ:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _deltaR:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _rootMotion: 0
+  - _name: Hanging
+    _duration: 0
+    _deltaX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _deltaY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _deltaZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _deltaR:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _rootMotion: 0
+  - _name: Gripping
+    _duration: 0
+    _deltaX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _deltaY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _deltaZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _deltaR:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _rootMotion: 0
+  - _name: TurnLeft
+    _duration: .200000003
+    _deltaX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _deltaY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _deltaZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaR:
       serializedVersion: 2
       m_Curve:
@@ -1992,23 +2063,24 @@ MonoBehaviour:
         tangentMode: 5
       m_PreInfinity: 2
       m_PostInfinity: 2
-  _turnRight:
-    _baseDuration: .100000001
+    _rootMotion: 0
+  - _name: TurnRight
+    _duration: .200000003
     _deltaX:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaY:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaZ:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaR:
       serializedVersion: 2
       m_Curve:
@@ -2024,50 +2096,52 @@ MonoBehaviour:
         tangentMode: 5
       m_PreInfinity: 2
       m_PostInfinity: 2
-  _turnBack:
-    _baseDuration: .200000003
+    _rootMotion: 0
+  - _name: TurnBack
+    _duration: .400000006
     _deltaX:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaY:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaZ:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaR:
       serializedVersion: 2
       m_Curve:
       - time: 0
         value: 0
         inSlope: 0
-        outSlope: 180
+        outSlope: 180.000015
         tangentMode: 17
       - time: 1
-        value: 180
-        inSlope: 180
+        value: 180.000015
+        inSlope: 180.000015
         outSlope: 0
         tangentMode: 21
       m_PreInfinity: 2
       m_PostInfinity: 2
-  _run:
-    _baseDuration: 1
+    _rootMotion: 0
+  - _name: Run
+    _duration: 1
     _deltaX:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaY:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaZ:
       serializedVersion: 2
       m_Curve:
@@ -2086,354 +2160,157 @@ MonoBehaviour:
     _deltaR:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-  _climb:
-    _baseDuration: 1.76699996
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _rootMotion: 0
+  - _name: Climb
+    _duration: 1.74000001
     _deltaX:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaY:
       serializedVersion: 2
       m_Curve:
       - time: 0
-        value: 1.1920929e-07
-        inSlope: -.0164477751
-        outSlope: -.0164477751
+        value: .00361074507
+        inSlope: -.0288638864
+        outSlope: -.0288638864
+        tangentMode: 10
+      - time: .142651469
+        value: -.000506730983
+        inSlope: -.263727516
+        outSlope: -.263727516
         tangentMode: 0
-      - time: .0478483848
-        value: -.00191720913
-        inSlope: -.0576680787
-        outSlope: -.0576680787
-        tangentMode: 0
-      - time: .0992750153
-        value: -.00485148281
-        inSlope: -.0616535544
-        outSlope: -.0616535544
-        tangentMode: 0
-      - time: .14236553
-        value: -.0407392345
-        inSlope: -.0946223736
-        outSlope: -.0946223736
-        tangentMode: 0
-      - time: .162661448
-        value: .0134369396
-        inSlope: 2.78824496
-        outSlope: 2.78824496
-        tangentMode: 0
-      - time: .194472
-        value: .108084857
-        inSlope: 2.44372797
-        outSlope: 1.38307297
-        tangentMode: 1
-      - time: .278669357
-        value: .16357252
-        inSlope: .480487943
-        outSlope: .480487943
-        tangentMode: 1
-      - time: .349620461
-        value: .228093445
-        inSlope: .715702772
-        outSlope: .715702772
-        tangentMode: 1
-      - time: .401956022
-        value: .250023603
-        inSlope: 1.04071188
-        outSlope: .96439296
-        tangentMode: 1
-      - time: .499895096
-        value: .373185754
-        inSlope: 1.50209582
-        outSlope: 2.54586339
-        tangentMode: 1
-      - time: .599545002
-        value: .561373174
-        inSlope: 1.70618296
-        outSlope: 1.70618296
-        tangentMode: 1
-      - time: .702625573
-        value: .798965871
-        inSlope: 1.70424843
-        outSlope: .928710043
-        tangentMode: 1
-      - time: .795599103
-        value: .900661588
-        inSlope: .444282293
-        outSlope: .444282293
-        tangentMode: 0
-      - time: .860112131
-        value: .9383775
-        inSlope: .141816124
-        outSlope: .141816124
-        tangentMode: 0
-      - time: .910991609
-        value: .959345937
-        inSlope: .647604465
-        outSlope: .647604465
-        tangentMode: 0
-      - time: .953179955
-        value: .982806563
-        inSlope: .464707583
-        outSlope: .464707583
-        tangentMode: 0
+      - time: .370006293
+        value: -.121082038
+        inSlope: -.530339777
+        outSlope: .00425319187
+        tangentMode: 21
+      - time: .501544356
+        value: -.120522581
+        inSlope: .00425319187
+        outSlope: .378858268
+        tangentMode: 21
+      - time: .600812793
+        value: -.0829139128
+        inSlope: .378858268
+        outSlope: -.0426636972
+        tangentMode: 21
+      - time: .999980152
+        value: -.0999438688
+        inSlope: -.0426636972
+        outSlope: 55417.4062
+        tangentMode: 21
       - time: 1
         value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
+        inSlope: 55417.4062
+        outSlope: 936.75885
+        tangentMode: 5
       m_PreInfinity: 2
       m_PostInfinity: 2
     _deltaZ:
       serializedVersion: 2
       m_Curve:
       - time: 0
-        value: 5.58793545e-09
-        inSlope: .171370447
-        outSlope: .171370447
+        value: -.00166279264
+        inSlope: .00454262504
+        outSlope: .00454262504
         tangentMode: 10
-      - time: .0568787977
-        value: .00974735059
-        inSlope: .220736057
-        outSlope: .220736057
-        tangentMode: 19
-      - time: .11595057
-        value: .0257027354
-        inSlope: .270101666
-        outSlope: .428687364
+      - time: .99998349
+        value: .00287975743
+        inSlope: .00454262504
+        outSlope: 60393.1484
         tangentMode: 21
-      - time: .184219509
-        value: .0549687669
-        inSlope: .428687364
-        outSlope: .460759282
-        tangentMode: 5
-      - time: .293806434
-        value: .104348063
-        inSlope: .703330338
-        outSlope: .703330338
-        tangentMode: 10
-      - time: .354913771
-        value: .162770703
-        inSlope: 1.11391592
-        outSlope: 1.11391592
-        tangentMode: 10
-      - time: .403161943
-        value: .224131092
-        inSlope: 1.30648386
-        outSlope: 1.30648386
-        tangentMode: 10
-      - time: .449662983
-        value: .286498368
-        inSlope: 1.36108828
-        outSlope: 1.36108828
-        tangentMode: 0
-      - time: .501639664
-        value: .388751447
-        inSlope: 1.4174825
-        outSlope: 1.4174825
-        tangentMode: 10
-      - time: .588065147
-        value: .463740885
-        inSlope: .616964042
-        outSlope: .616964042
-        tangentMode: 10
-      - time: .620895565
-        value: .475765049
-        inSlope: .490707695
-        outSlope: .490707695
-        tangentMode: 10
-      - time: .703765988
-        value: .526744008
-        inSlope: 1.46776438
-        outSlope: 1.46776438
-        tangentMode: 0
-      - time: .720802665
-        value: .589654088
-        inSlope: 1.51634216
-        outSlope: 1.51634216
-        tangentMode: 0
-      - time: .784638941
-        value: .69583118
-        inSlope: 1.44302845
-        outSlope: 1.44302845
-        tangentMode: 0
-      - time: .880201459
-        value: .786714196
-        inSlope: 1.79052353
-        outSlope: 1.79052353
-        tangentMode: 1
-      - time: .960253179
-        value: .998628378
-        inSlope: 1.77741051
-        outSlope: .0345089771
-        tangentMode: 17
       - time: 1
         value: 1
-        inSlope: .0345089771
-        outSlope: 1.3557446
-        tangentMode: 5
+        inSlope: 60393.1484
+        outSlope: 60393.1484
+        tangentMode: 10
       m_PreInfinity: 2
       m_PostInfinity: 2
     _deltaR:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-  _jumpDown:
-    _baseDuration: 2.5
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _rootMotion: 1
+  - _name: JumpDown
+    _duration: 2.53299999
     _deltaX:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaY:
       serializedVersion: 2
       m_Curve:
       - time: 0
         value: 0
-        inSlope: .0345738009
-        outSlope: .0345738009
-        tangentMode: 10
-      - time: .398109227
-        value: .0137641495
-        inSlope: .0826735049
-        outSlope: .0826735049
-        tangentMode: 0
-      - time: .439971894
-        value: .0414489098
-        inSlope: 1.43274307
-        outSlope: 1.43274307
-        tangentMode: 10
-      - time: .531018794
-        value: .242131099
-        inSlope: -.0387956798
-        outSlope: -.0387956798
-        tangentMode: 0
-      - time: .75345552
-        value: -1.0006572
-        inSlope: -2.90280461
-        outSlope: 0
-        tangentMode: 1
-      - time: .764829218
-        value: -1.00000191
-        inSlope: .14424324
-        outSlope: .14424324
-        tangentMode: 1
-      - time: .870988071
-        value: -.99990207
-        inSlope: .117831238
-        outSlope: .117831238
-        tangentMode: 9
-      - time: .918937504
-        value: -.988647282
-        inSlope: .0473365337
-        outSlope: .0473365337
-        tangentMode: 11
+        inSlope: 1
+        outSlope: -2.04571661e-05
+        tangentMode: 17
+      - time: .46740222
+        value: -9.56172516e-06
+        inSlope: -2.04571661e-05
+        outSlope: .116757885
+        tangentMode: 21
+      - time: .999945521
+        value: .0621690676
+        inSlope: .116757885
+        outSlope: -19496.9805
+        tangentMode: 21
       - time: 1
         value: -1
-        inSlope: 0
+        inSlope: -19496.9805
         outSlope: 0
-        tangentMode: 0
+        tangentMode: 21
       m_PreInfinity: 2
       m_PostInfinity: 2
     _deltaZ:
       serializedVersion: 2
       m_Curve:
       - time: 0
-        value: 0
-        inSlope: .162844494
-        outSlope: .162844494
+        value: .00271698833
+        inSlope: -.00586550077
+        outSlope: -.00586550077
         tangentMode: 10
-      - time: .123155601
-        value: .0200552121
-        inSlope: .278510749
-        outSlope: .278510749
-        tangentMode: 10
-      - time: .207323253
-        value: .0532321669
-        inSlope: .571131408
-        outSlope: .571131408
-        tangentMode: 10
-      - time: .273825169
-        value: .102981307
-        inSlope: .733001709
-        outSlope: .733001709
-        tangentMode: 10
-      - time: .335181653
-        value: .147030205
-        inSlope: 1.20942891
-        outSlope: 1.12528181
-        tangentMode: 1
-      - time: .382390678
-        value: .18490015
-        inSlope: 1.45665276
-        outSlope: 1.61783147
-        tangentMode: 1
-      - time: .431488812
-        value: .259991467
-        inSlope: 1.58740735
-        outSlope: 1.58740735
-        tangentMode: 0
-      - time: .496582925
-        value: .373450875
-        inSlope: 1.77965665
-        outSlope: 1.77965665
-        tangentMode: 0
-      - time: .536786854
-        value: .452077568
-        inSlope: 1.80876875
-        outSlope: 1.80876875
-        tangentMode: 0
-      - time: .722200513
-        value: .921842098
-        inSlope: 1.75541818
-        outSlope: 1.75541818
-        tangentMode: 0
-      - time: .751914263
-        value: .935289919
-        inSlope: .895430267
-        outSlope: .895430267
-        tangentMode: 10
-      - time: .823559344
-        value: 1.0311712
-        inSlope: .975582659
-        outSlope: .975582659
-        tangentMode: 10
-      - time: .89613539
-        value: 1.07565188
-        inSlope: .46511364
-        outSlope: .46511364
-        tangentMode: 9
-      - time: .949089289
-        value: 1.09245646
-        inSlope: -.290035307
-        outSlope: -.290035307
-        tangentMode: 3
-      - time: .981412113
-        value: 1.0634495
-        inSlope: -.335466415
-        outSlope: -2.20608783
-        tangentMode: 1
+      - time: .468405217
+        value: -3.04427394e-05
+        inSlope: -.00586550077
+        outSlope: -.384188443
+        tangentMode: 21
+      - time: .760320604
+        value: -.112180963
+        inSlope: -.384188443
+        outSlope: -.005931844
+        tangentMode: 21
+      - time: .998986602
+        value: -.113596693
+        inSlope: -.005931844
+        outSlope: 2354.54321
+        tangentMode: 5
       - time: 1
         value: 1
-        inSlope: -3.41348648
-        outSlope: -3.41348648
-        tangentMode: 10
+        inSlope: 1098.87378
+        outSlope: 936.75885
+        tangentMode: 5
       m_PreInfinity: 2
       m_PostInfinity: 2
     _deltaR:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-  _push:
-    _baseDuration: .400000006
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _rootMotion: 1
+  - _name: Push
+    _duration: .400000006
     _deltaX:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaY:
       serializedVersion: 2
       m_Curve: []
@@ -2447,15 +2324,16 @@ MonoBehaviour:
     _deltaR:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-  _pull:
-    _baseDuration: 1
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _rootMotion: 0
+  - _name: Pull
+    _duration: 1
     _deltaX:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaY:
       serializedVersion: 2
       m_Curve: []
@@ -2479,10 +2357,87 @@ MonoBehaviour:
     _deltaR:
       serializedVersion: 2
       m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _rootMotion: 0
+  - _name: PullToEdge
+    _duration: 1
+    _deltaX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _deltaY:
+      serializedVersion: 2
+      m_Curve: []
       m_PreInfinity: 2
       m_PostInfinity: 2
-  _hangUp:
-    _baseDuration: 1.10000002
+    _deltaZ:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: 1
+        outSlope: -1
+        tangentMode: 17
+      - time: 1
+        value: -1
+        inSlope: -1
+        outSlope: 0
+        tangentMode: 21
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaR:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _rootMotion: 0
+  - _name: EdgeToHang
+    _duration: .400000006
+    _deltaX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _deltaY:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: -1.33683659e-06
+        outSlope: -1.33683659e-06
+        tangentMode: 0
+      - time: 1
+        value: -.725000024
+        inSlope: -1.91110158
+        outSlope: -1.91110158
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaZ:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: .299999863
+        outSlope: .299999863
+        tangentMode: 10
+      - time: 1
+        value: .299999863
+        inSlope: .299999863
+        outSlope: 1.04426265
+        tangentMode: 5
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaR:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _rootMotion: 0
+  - _name: HangUp
+    _duration: 1.10000002
     _deltaX:
       serializedVersion: 2
       m_Curve: []
@@ -2494,43 +2449,13 @@ MonoBehaviour:
       - time: 0
         value: 0
         inSlope: 1
-        outSlope: -.165694118
+        outSlope: -.00274442695
         tangentMode: 17
-      - time: .176931232
-        value: -.0293164644
-        inSlope: -.165694118
-        outSlope: 2.38821411
-        tangentMode: 21
-      - time: .197558016
-        value: .0199447125
-        inSlope: 2.38821411
-        outSlope: .508522093
-        tangentMode: 21
-      - time: .285521716
-        value: .0646761954
-        inSlope: .508522093
-        outSlope: .879746974
-        tangentMode: 5
-      - time: .347782463
-        value: .127039611
-        inSlope: 1.06398022
-        outSlope: 1.06398022
-        tangentMode: 1
-      - time: .499430299
-        value: .301195621
-        inSlope: 1.29655004
-        outSlope: 1.29655004
-        tangentMode: 1
-      - time: .610641897
-        value: .498265386
-        inSlope: 1.22308731
-        outSlope: 1.22308731
-        tangentMode: 1
-      - time: .941690385
-        value: .683925986
-        inSlope: .194907188
+      - time: .999864936
+        value: -.00274405628
+        inSlope: -.00274442695
         outSlope: .194907188
-        tangentMode: 1
+        tangentMode: 5
       - time: 1
         value: .725000024
         inSlope: 0
@@ -2543,29 +2468,24 @@ MonoBehaviour:
       m_Curve:
       - time: 0
         value: 0
-        inSlope: -.0925303549
-        outSlope: -.0925303549
+        inSlope: -.215234905
+        outSlope: -.215234905
         tangentMode: 10
-      - time: .149448186
-        value: -.0138284937
-        inSlope: -.003103778
-        outSlope: -.003103778
-        tangentMode: 0
-      - time: .310815096
-        value: .0851110145
-        inSlope: .120274819
-        outSlope: .120274819
-        tangentMode: 0
-      - time: .377822608
-        value: .138082221
-        inSlope: .0690410659
-        outSlope: .0690410659
-        tangentMode: 0
-      - time: .501288533
-        value: .161578745
-        inSlope: .541568756
-        outSlope: .541568756
-        tangentMode: 0
+      - time: .103309952
+        value: -.0222359076
+        inSlope: -.0828608498
+        outSlope: -.0828608498
+        tangentMode: 19
+      - time: .599877059
+        value: .00235072151
+        inSlope: .0495132059
+        outSlope: .199695513
+        tangentMode: 21
+      - time: .999167025
+        value: .0820871368
+        inSlope: .199695513
+        outSlope: .116527081
+        tangentMode: 5
       - time: .999998987
         value: .699999988
         inSlope: 0
@@ -2576,53 +2496,29 @@ MonoBehaviour:
     _deltaR:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-  _hangDown:
-    _baseDuration: 1.26699996
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _rootMotion: 1
+  - _name: HangDown
+    _duration: 1.06700003
     _deltaX:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
+      m_PreInfinity: 0
+      m_PostInfinity: 0
     _deltaY:
       serializedVersion: 2
       m_Curve:
       - time: 0
         value: 0
         inSlope: 1
-        outSlope: .000358353689
+        outSlope: -.0555264801
         tangentMode: 17
-      - time: .272037566
-        value: 9.74856666e-05
-        inSlope: .0214957315
-        outSlope: 1.032354
-        tangentMode: 1
-      - time: .391567796
-        value: .190204263
-        inSlope: -.0784105062
-        outSlope: -.0784105062
-        tangentMode: 10
-      - time: .499027282
-        value: .00244349288
-        inSlope: -2.00613666
-        outSlope: -2.00613666
-        tangentMode: 10
-      - time: .676459849
-        value: -.399441808
-        inSlope: -2.0690577
-        outSlope: -2.0690577
-        tangentMode: 10
-      - time: .852236032
-        value: -.728690386
-        inSlope: -.82454896
-        outSlope: -.82454896
-        tangentMode: 0
-      - time: .918255866
-        value: -.750800252
-        inSlope: -.0209372342
-        outSlope: -.0209372342
-        tangentMode: 10
+      - time: .999499679
+        value: -.0554987006
+        inSlope: -.0555264801
+        outSlope: -724.977234
+        tangentMode: 5
       - time: 1
         value: -.725000024
         inSlope: 0
@@ -2633,56 +2529,26 @@ MonoBehaviour:
     _deltaZ:
       serializedVersion: 2
       m_Curve:
-      - time: 0
-        value: 0
+      - time: .0010030081
+        value: -.00174213573
         inSlope: -0
         outSlope: -0
         tangentMode: 0
-      - time: .1844244
-        value: .0425957963
-        inSlope: .681002855
-        outSlope: .681002855
-        tangentMode: 10
-      - time: .273722678
-        value: .143595681
-        inSlope: 1.2705431
-        outSlope: 1.2705431
-        tangentMode: 10
-      - time: .341148794
-        value: .238669664
-        inSlope: 1.30784416
-        outSlope: 1.30784416
-        tangentMode: 10
-      - time: .392952919
-        value: .301126868
-        inSlope: 1.26103866
-        outSlope: 1.26103866
-        tangentMode: 10
-      - time: .726795554
-        value: .740609288
-        inSlope: 1.01811075
-        outSlope: 1.01811075
-        tangentMode: 10
-      - time: .760937989
-        value: .765184522
-        inSlope: .457600653
-        outSlope: .457600653
-        tangentMode: 10
-      - time: .818557382
-        value: .776444256
-        inSlope: -.206612453
-        outSlope: -.206612453
-        tangentMode: 10
-      - time: .882612824
-        value: .737457514
-        inSlope: -.720940113
-        outSlope: -.720940113
-        tangentMode: 10
-      - time: .947359979
-        value: .683507621
-        inSlope: -.259964436
-        outSlope: -.259964436
-        tangentMode: 10
+      - time: .110330939
+        value: .0331324525
+        inSlope: .000566360541
+        outSlope: -.0057605342
+        tangentMode: 17
+      - time: .499431163
+        value: .0308910273
+        inSlope: -.0057605342
+        outSlope: -.0625739619
+        tangentMode: 21
+      - time: .998513401
+        value: -.00033852458
+        inSlope: -.0625739619
+        outSlope: 724.712891
+        tangentMode: 5
       - time: .999998987
         value: .699999988
         inSlope: 0
@@ -2696,27 +2562,23 @@ MonoBehaviour:
       - time: 0
         value: 0
         inSlope: 0
-        outSlope: 1.13561332
+        outSlope: -4.47021193e-08
         tangentMode: 17
-      - time: .310748398
-        value: .352890015
-        inSlope: 1.13561332
-        outSlope: 111.569336
-        tangentMode: 5
-      - time: .823977172
-        value: 179.728577
-        inSlope: 6.13885021
-        outSlope: 1.54197812
-        tangentMode: 17
+      - time: .999989808
+        value: -4.47016646e-08
+        inSlope: -4.47021193e-08
+        outSlope: 17660228
+        tangentMode: 21
       - time: 1
         value: 180
-        inSlope: 0
+        inSlope: 17660228
         outSlope: 0
-        tangentMode: 0
+        tangentMode: 21
       m_PreInfinity: 2
       m_PostInfinity: 2
-  _hangLeft:
-    _baseDuration: 1.45000005
+    _rootMotion: 1
+  - _name: HangLeft
+    _duration: 1.5
     _deltaX:
       serializedVersion: 2
       m_Curve:
@@ -2745,10 +2607,11 @@ MonoBehaviour:
     _deltaR:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-  _hangRight:
-    _baseDuration: 1.45000005
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _rootMotion: 0
+  - _name: HangRight
+    _duration: 1.5
     _deltaX:
       serializedVersion: 2
       m_Curve:
@@ -2777,75 +2640,54 @@ MonoBehaviour:
     _deltaR:
       serializedVersion: 2
       m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-  _hangAcuteLeft:
-    _baseDuration: 1
-    _deltaX:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-    _deltaY:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-    _deltaZ:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-    _deltaR:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-  _hangAcuteRight:
-    _baseDuration: 1
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+    _rootMotion: 0
+  - _name: HangLeftConvexe
+    _duration: 1.5
     _deltaX:
       serializedVersion: 2
       m_Curve:
       - time: 0
         value: 0
-        inSlope: 1.16555536
-        outSlope: 1.16555536
+        inSlope: -.0503128842
+        outSlope: -.0503128842
         tangentMode: 10
-      - time: .60117656
-        value: .700704575
-        inSlope: .0108068259
-        outSlope: -.000750394538
-        tangentMode: 17
-      - time: 1
-        value: .7004053
-        inSlope: -.000750394538
-        outSlope: -.000750394538
-        tangentMode: 10
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-    _deltaY:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-    _deltaZ:
-      serializedVersion: 2
-      m_Curve:
-      - time: 0
-        value: 0
-        inSlope: 1
-        outSlope: -.00843403954
-        tangentMode: 17
-      - time: .451322526
-        value: -.00380647182
-        inSlope: -.00843403954
-        outSlope: .0198731776
+      - time: .999950528
+        value: -.0503103957
+        inSlope: -.0503128842
+        outSlope: .116527081
         tangentMode: 5
       - time: 1
-        value: -.699825704
-        inSlope: -1.26853979
+        value: -.699999809
+        inSlope: 0
         outSlope: 0
-        tangentMode: 21
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaZ:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: .0215762146
+        outSlope: .0215762146
+        tangentMode: 10
+      - time: .999167025
+        value: .0215582419
+        inSlope: .0215762146
+        outSlope: .116527081
+        tangentMode: 5
+      - time: .999998987
+        value: .699999988
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
     _deltaR:
@@ -2854,45 +2696,41 @@ MonoBehaviour:
       - time: 0
         value: 0
         inSlope: 0
-        outSlope: -.0156577881
+        outSlope: -.00556895277
         tangentMode: 17
-      - time: .452176124
-        value: -.00708007812
-        inSlope: -.0156577881
-        outSlope: 872.432007
-        tangentMode: 21
-      - time: .555427551
-        value: 90.0727692
-        inSlope: 872.432007
-        outSlope: -.163683474
+      - time: .999983668
+        value: -.00556886196
+        inSlope: -.00556895277
+        outSlope: 5511105.5
         tangentMode: 21
       - time: 1
         value: 90
-        inSlope: -.163683474
+        inSlope: 5511105.5
         outSlope: 0
         tangentMode: 5
       m_PreInfinity: 2
       m_PostInfinity: 2
-  _hangObtuseLeft:
-    _baseDuration: 1
+    _rootMotion: 1
+  - _name: HangRightConvexe
+    _duration: 1.5
     _deltaX:
       serializedVersion: 2
       m_Curve:
       - time: 0
         value: 0
-        inSlope: 1
-        outSlope: -1.27093315
-        tangentMode: 17
-      - time: .54986614
-        value: -.698843122
-        inSlope: .0405596346
-        outSlope: -.00232018228
-        tangentMode: 17
-      - time: 1
-        value: -.699887514
-        inSlope: -.00232018228
+        inSlope: .0489091352
+        outSlope: .0489091352
+        tangentMode: 10
+      - time: .999167025
+        value: .0488683954
+        inSlope: .0489091352
+        outSlope: .116527081
+        tangentMode: 5
+      - time: .999998987
+        value: .699999988
+        inSlope: 0
         outSlope: 0
-        tangentMode: 21
+        tangentMode: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
     _deltaY:
@@ -2905,96 +2743,19 @@ MonoBehaviour:
       m_Curve:
       - time: 0
         value: 0
-        inSlope: .000257083768
-        outSlope: .000257083768
+        inSlope: .0215762146
+        outSlope: .0215762146
         tangentMode: 10
-      - time: .449555457
-        value: .000115573406
-        inSlope: .000257083768
-        outSlope: .0363775901
+      - time: .999167025
+        value: .0215582419
+        inSlope: .0215762146
+        outSlope: .116527081
         tangentMode: 5
-      - time: 1
-        value: .699680328
-        inSlope: 1.27090871
-        outSlope: 1.27090871
-        tangentMode: 10
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-    _deltaR:
-      serializedVersion: 2
-      m_Curve:
-      - time: 0
-        value: 0
+      - time: .999998987
+        value: .699999988
         inSlope: 0
-        outSlope: -.0156577881
-        tangentMode: 17
-      - time: .452176124
-        value: -.00708007812
-        inSlope: -.0156577881
-        outSlope: 872.432007
-        tangentMode: 21
-      - time: .555427551
-        value: 90.0727692
-        inSlope: 872.432007
-        outSlope: -.163683474
-        tangentMode: 21
-      - time: 1
-        value: 90
-        inSlope: -.163683474
         outSlope: 0
-        tangentMode: 5
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-  _hangObtuseRight:
-    _baseDuration: 1
-    _deltaX:
-      serializedVersion: 2
-      m_Curve:
-      - time: 0
-        value: 0
-        inSlope: .887061834
-        outSlope: .887061834
-        tangentMode: 10
-      - time: .452189595
-        value: .401120126
-        inSlope: .990920722
-        outSlope: .0360230729
-        tangentMode: 1
-      - time: .60117656
-        value: .700704575
-        inSlope: .0108068259
-        outSlope: -.000750394538
-        tangentMode: 17
-      - time: 1
-        value: .7004053
-        inSlope: -.000750394538
-        outSlope: -.000750394538
-        tangentMode: 10
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-    _deltaY:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-    _deltaZ:
-      serializedVersion: 2
-      m_Curve:
-      - time: 0
-        value: 0
-        inSlope: .000257083768
-        outSlope: .000257083768
-        tangentMode: 10
-      - time: .449555457
-        value: .000115573406
-        inSlope: .000257083768
-        outSlope: .0363775901
-        tangentMode: 5
-      - time: 1
-        value: .699680328
-        inSlope: 1.27090871
-        outSlope: 1.27090871
-        tangentMode: 10
+        tangentMode: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
     _deltaR:
@@ -3003,25 +2764,224 @@ MonoBehaviour:
       - time: 0
         value: 0
         inSlope: 0
-        outSlope: .210275397
+        outSlope: .00924124941
         tangentMode: 17
-      - time: .449726164
-        value: .0945663452
-        inSlope: .210275397
-        outSlope: -881.503906
-        tangentMode: 21
-      - time: .552122831
-        value: -90.1684952
-        inSlope: -881.503906
-        outSlope: .376208454
+      - time: .999941587
+        value: .00924070925
+        inSlope: .00924124941
+        outSlope: -1540922.88
         tangentMode: 21
       - time: 1
         value: -90
-        inSlope: .376208454
+        inSlope: -1540922.88
         outSlope: 0
         tangentMode: 5
       m_PreInfinity: 2
       m_PostInfinity: 2
+    _rootMotion: 1
+  - _name: HangLeftConcave
+    _duration: 1
+    _deltaX:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: 2.10196577e-05
+        outSlope: 2.10196577e-05
+        tangentMode: 10
+      - time: .999939144
+        value: 2.10183789e-05
+        inSlope: 2.10196577e-05
+        outSlope: -4929.96826
+        tangentMode: 21
+      - time: 1
+        value: -.29999882
+        inSlope: -4929.96826
+        outSlope: 1.04426265
+        tangentMode: 5
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaZ:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: 2.10196577e-05
+        outSlope: 2.10196577e-05
+        tangentMode: 10
+      - time: .999939144
+        value: 2.10183789e-05
+        inSlope: 2.10196577e-05
+        outSlope: -4929.96826
+        tangentMode: 21
+      - time: 1
+        value: -.29999882
+        inSlope: -4929.96826
+        outSlope: 1.04426265
+        tangentMode: 5
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaR:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: 0
+        outSlope: .00924124941
+        tangentMode: 17
+      - time: .999941587
+        value: .00924070925
+        inSlope: .00924124941
+        outSlope: -1540922.88
+        tangentMode: 21
+      - time: 1
+        value: -90
+        inSlope: -1540922.88
+        outSlope: 0
+        tangentMode: 5
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _rootMotion: 1
+  - _name: HangRightConcave
+    _duration: 1
+    _deltaX:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: 2.10196577e-05
+        outSlope: 2.10196577e-05
+        tangentMode: 10
+      - time: .999939144
+        value: 2.10183789e-05
+        inSlope: 2.10196577e-05
+        outSlope: 4929.29492
+        tangentMode: 21
+      - time: 1
+        value: .299999863
+        inSlope: 4929.29492
+        outSlope: 1.04426265
+        tangentMode: 5
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaZ:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: 2.10196577e-05
+        outSlope: 2.10196577e-05
+        tangentMode: 10
+      - time: .999939144
+        value: 2.10183789e-05
+        inSlope: 2.10196577e-05
+        outSlope: -4929.96826
+        tangentMode: 21
+      - time: 1
+        value: -.29999882
+        inSlope: -4929.96826
+        outSlope: 1.04426265
+        tangentMode: 5
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaR:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: 0
+        outSlope: -.00556895277
+        tangentMode: 17
+      - time: .999983668
+        value: -.00556886196
+        inSlope: -.00556895277
+        outSlope: 5511105.5
+        tangentMode: 21
+      - time: 1
+        value: 90
+        inSlope: 5511105.5
+        outSlope: 0
+        tangentMode: 5
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _rootMotion: 1
+  - _name: HangDrop
+    _duration: .666999996
+    _deltaX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaY:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: -.00112046755
+        outSlope: -.00112046755
+        tangentMode: 10
+      - time: .99906671
+        value: -.0011194218
+        inSlope: -.00112046755
+        outSlope: -293.419586
+        tangentMode: 21
+      - time: 1.00000012
+        value: -.274999827
+        inSlope: -293.419586
+        outSlope: -293.419586
+        tangentMode: 10
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaZ:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: -1.97040026e-05
+        outSlope: -1.97040026e-05
+        tangentMode: 10
+      - time: .999981761
+        value: -1.97036425e-05
+        inSlope: -1.97040026e-05
+        outSlope: -16447.2188
+        tangentMode: 21
+      - time: 1
+        value: -.300000876
+        inSlope: -16447.2188
+        outSlope: 1.04426265
+        tangentMode: 5
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaR:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _rootMotion: 1
+--- !u!114 &11400004
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81c0c15e34cab6643b9fb6978e1a2e34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _sendingFlags: 1
+  _avgSpeedOnRootedTransition: 1
+  _mode: 1
 --- !u!137 &13700000
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 1

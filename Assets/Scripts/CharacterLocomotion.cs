@@ -205,7 +205,6 @@ public class CharacterLocomotion : MonoBehaviour
             // Hay input de movimiento
             if (_input.Direction != null)
             {
-                
                 // Empuja hacia el bloque
                 if (_input.Direction == Direction)
                 {
@@ -214,12 +213,25 @@ public class CharacterLocomotion : MonoBehaviour
                     Push(grippedBlock);
                 }
 
-                // Tira del bloque
-                else if (_input.Direction == Direction * -1f)
+                // Tira del bloque, si no hay bloques atras
+                else if (_input.Direction == Direction * -1f && 
+                    !Level.Grid.ExistsAt(Position - Direction))
                 {
-                    // Tira
-                    Debug.Log("Accion: Tirando");
-                    Pull(grippedBlock);
+                    // Hay un bloque atras abajo donde pararse
+                    if (Level.Grid.ExistsStillAt(Position - Direction - Vector3.up))
+                    {
+                        // Tira
+                        Debug.Log("Accion: Tirando");
+                        Pull(grippedBlock);
+                    }
+
+                    // No hay bloque donde quedarse parado =>  Tira pero cae
+                    else
+                    {
+                        // Tira
+                        Debug.Log("Accion: Tirando hacia borde");
+                        PullToEdge(grippedBlock);
+                    }
                 }
             }
 
@@ -318,12 +330,17 @@ public class CharacterLocomotion : MonoBehaviour
             }
 
             // Desplazamiento vertical
-            else if (newInput.y == 1)
+            else if (newInput.y != 0)
             {
-                if (!Level.Grid.ExistsStillAt(targetPos + Direction))
+                if (newInput.y == 1 && !Level.Grid.ExistsStillAt(targetPos + Direction))
                 {
                     Debug.Log("Accion: Colgando -> Subir");
                     HangUp();
+                }
+                else if (newInput.y == -1 && Level.Grid.ExistsStillAt(targetPos))
+                {
+                    Debug.Log("Accion: Colgando -> Caer");
+                    HangDrop();
                 }
                 else
                 {
@@ -587,7 +604,7 @@ public class CharacterLocomotion : MonoBehaviour
         // Si es NaN el bloque es inamovible
         if (float.IsNaN(duration)) return;
 
-        // Inicia la rutina de la accion. Se le indica que una vez finalizada la tarea vuelva a la velocidad general
+        // Inicia la corutina
         StartCoroutine(_Push(1 / duration));
     }
 
@@ -624,6 +641,35 @@ public class CharacterLocomotion : MonoBehaviour
 
         // Inicia la rutina de la accion. Se le indica que una vez finalizada la tarea vuelva a la velocidad general
         StartCoroutine(DoAction(_actionsHash["Pull"], State.Moving, State.Gripping, actionSpeed, delegate { _mecanim.SetSpeed(_generalSpeed); }));
+    }
+
+    private void PullToEdge(Block block)
+    {
+        // Comunica al bloque la instruccion de "Pull" y le devuelve el tiempo que demora la accion
+        var duration = block.Pulled(Position);
+
+        // Si es NaN el bloque es inamovible
+        if (float.IsNaN(duration)) return;
+        
+        // Inicia la corutina
+        StartCoroutine(_PullToEdge(1 / duration));
+    }
+
+    private IEnumerator _PullToEdge(float actionSpeed)
+    {
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("PullToEdge");
+        _mecanim.SetSpeed(_generalSpeed);
+
+        // Realiza la primera parte de la accion
+        yield return StartCoroutine(DoAction(_actionsHash["PullToEdge"], State.Moving, State.Moving, actionSpeed));
+
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("EdgeToHang");
+        _mecanim.SetSpeed(_generalSpeed);
+
+        // Realiza la segunda parte de la accion
+        yield return StartCoroutine(DoAction(_actionsHash["EdgeToHang"], State.Moving, State.Hanging, _generalSpeed));
     }
 
     private void HangUp()
@@ -704,6 +750,16 @@ public class CharacterLocomotion : MonoBehaviour
 
         // Inicia la rutina de la accion
         StartCoroutine(DoAction(_actionsHash["HangRightConvexe"], State.Moving, State.Hanging, _generalSpeed));
+    }
+
+    private void HangDrop()
+    {
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("HangDrop");
+        _mecanim.SetSpeed(_generalSpeed);
+
+        // Inicia la rutina de la accion
+        StartCoroutine(DoAction(_actionsHash["HangDrop"], State.Moving, State.Standing, _generalSpeed));
     }
 
     #endregion
