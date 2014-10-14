@@ -21,7 +21,7 @@ public class CharacterLocomotion : MonoBehaviour
     private State _state;
     private CharacterInput _input;
     private CharacterMecanimController _mecanim;
-    
+
     #endregion
 
     #region Properties (public)
@@ -214,7 +214,7 @@ public class CharacterLocomotion : MonoBehaviour
                 }
 
                 // Tira del bloque, si no hay bloques atras
-                else if (_input.Direction == Direction * -1f && 
+                else if (_input.Direction == Direction * -1f &&
                     !Level.Grid.ExistsAt(Position - Direction))
                 {
                     // Hay un bloque atras abajo donde pararse
@@ -365,7 +365,7 @@ public class CharacterLocomotion : MonoBehaviour
 
         // Determina la posicion objetivo
         var targetPos = Position + Direction;
-        
+
         // Hay un cubo en el lugar destino?
         if (Level.Grid.ExistsAt(targetPos))
         {
@@ -403,7 +403,110 @@ public class CharacterLocomotion : MonoBehaviour
             HangDown();
         }
     }
-    
+
+    /// <summary>
+    /// Se encarga las transformaciones y cambios en el flag de estado
+    /// </summary>
+    /// <param name="action">Contenedor con los datos de las transformaciones</param>
+    /// <param name="newState">Estado en el cual se encontrara mientras realiza la accion</param>
+    /// <param name="endState">Estado en el que quedara luego de terminada la accion</param>
+    /// <param name="speedFactor">Velocidad a la que realiza la accion. Siendo '1' la velocidad normal.</param>
+    /// <param name="afterAction">Delegado de intrucciones a realizar finalizada la tarea</param>
+    /// <returns></returns>
+    private IEnumerator DoFixedAction(ActionData action, State newState, State endState, float speedFactor, Action afterAction = null)
+    {
+        // Cambio al nuevo estado y establece el root motion
+        _state = newState;
+        _mecanim.ApplyRootMotion(action.RootMotion);
+
+        // Almacena valores iniciales
+        var startPosition = transform.position;
+        var startRotation = transform.rotation;
+        var actionDuration = action.duration / speedFactor;
+
+        // Calcula cantidad de frames a emplear
+        var totalFrames = (int)(actionDuration / Time.fixedDeltaTime);
+        var framesCounter = 0;
+
+        // Flags de presencia de curvas
+        var hasDeltaX = action.deltaX.keys.Length > 0;
+        var hasDeltaY = action.deltaY.keys.Length > 0;
+        var hasDeltaZ = action.deltaZ.keys.Length > 0;
+        var hasDeltaR = action.deltaR.keys.Length > 0;
+
+        // A lo largo de la duracion de la accion aplica las tranformaciones
+        var deltaRotation = 0f;
+        var deltaPosition = Vector3.zero;
+        while (framesCounter < totalFrames)
+        {
+            // Porcentaje [0,1] de progreso de la accion
+            var fraction = Mathf.Clamp01((float)framesCounter++ / (totalFrames - 1));
+
+            #region Posicion
+
+            // Obtiene el nuevo delta
+            var currDeltaPosition = new Vector3(
+                hasDeltaX ? action.deltaX.Evaluate(fraction) : 0f,
+                hasDeltaY ? action.deltaY.Evaluate(fraction) : 0f,
+                hasDeltaZ ? action.deltaZ.Evaluate(fraction) : 0f
+            );
+
+            //Debug.Log("Fraction: " + fraction.ToString() + "\n DeltaZ: " + (currDeltaPosition - deltaPosition).z.ToString());
+
+            // Lo orienta
+            currDeltaPosition = startRotation * currDeltaPosition;
+
+            // Si es el ultimo frame de accion el posicionamiento es absoluto, sino relativo
+            if (fraction == 1f)
+            {
+                // Modifica la posicion
+                transform.position = startPosition + currDeltaPosition;
+            }
+            else
+            {
+                // Modifica la posicion
+                transform.position += currDeltaPosition - deltaPosition;
+
+                // Guarda el delta actual
+                deltaPosition = currDeltaPosition;
+            }
+
+            #endregion
+
+            #region Rotacion
+
+            if (hasDeltaR)
+            {
+                // Obtiene el nuevo delta
+                var currDeltaRotation = action.deltaR.Evaluate(fraction);
+
+                // Si es el ultimo frame de accion la rotacion es absoluta, sino relativa
+                if (fraction == 1f)
+                {
+                    transform.rotation = startRotation * Quaternion.Euler(0f, currDeltaRotation, 0f);
+                }
+                else
+                {
+                    transform.rotation = transform.rotation * Quaternion.Euler(0f, currDeltaRotation - deltaRotation, 0f);
+                    deltaRotation = currDeltaRotation;
+                }
+            }
+
+            #endregion
+
+            // Espera al siguiente frame
+            yield return new WaitForFixedUpdate();
+        }
+
+        // Ejecuta la accion si la hay
+        if (afterAction != null)
+            afterAction();
+
+        // Cambia al estado en que queda luego de la accion y desactiva el rootMotion
+        _state = endState;
+        _mecanim.ApplyRootMotion(false);
+    }
+
     /// <summary>
     /// Se encarga las transformaciones y cambios en el flag de estado
     /// </summary>
@@ -447,15 +550,14 @@ public class CharacterLocomotion : MonoBehaviour
 
             // Obtiene el nuevo delta
             var currDeltaPosition = new Vector3(
-                hasDeltaX ? action.deltaX.Evaluate(fraction) : 0f,
-                hasDeltaY ? action.deltaY.Evaluate(fraction) : 0f,
-                hasDeltaZ ? action.deltaZ.Evaluate(fraction) : 0f
+            hasDeltaX ? action.deltaX.Evaluate(fraction) : 0f,
+            hasDeltaY ? action.deltaY.Evaluate(fraction) : 0f,
+            hasDeltaZ ? action.deltaZ.Evaluate(fraction) : 0f
             );
 
             // Lo orienta
             currDeltaPosition = startRotation * currDeltaPosition;
-
-            Debug.Log("Fraction: " + fraction.ToString() + "\n DeltaZ: " + (currDeltaPosition - deltaPosition).x.ToString());
+            //Debug.Log("Fraction: " + fraction.ToString() + "\n DeltaZ: " + (currDeltaPosition - deltaPosition).x.ToString());
 
             // Si es el ultimo frame de accion el posicionamiento es absoluto, sino relativo
             if (fraction == 1f)
@@ -472,7 +574,7 @@ public class CharacterLocomotion : MonoBehaviour
                 deltaPosition = currDeltaPosition;
             }
 
-            #endregion            
+            #endregion
 
             #region Rotacion
 
@@ -578,7 +680,7 @@ public class CharacterLocomotion : MonoBehaviour
         _mecanim.SetFloat("RunSpeed", _runSpeed / transform.localScale.x);
 
         // Inicia la rutina de la accion. Se le indica que una vez finalizada la tarea vuelva a la velocidad general
-        StartCoroutine(DoAction(_actionsHash["Run"], State.Moving, State.Standing, _runSpeed, delegate { _mecanim.SetSpeed(_generalSpeed); }));
+        StartCoroutine(DoFixedAction(_actionsHash["Run"], State.Moving, State.Standing, _runSpeed, delegate { _mecanim.SetSpeed(_generalSpeed); }));
     }
 
     private void Climb()
@@ -655,7 +757,7 @@ public class CharacterLocomotion : MonoBehaviour
 
         // Si es NaN el bloque es inamovible
         if (float.IsNaN(duration)) return;
-        
+
         // Inicia la corutina
         StartCoroutine(_PullToEdge(1 / duration));
     }
@@ -788,7 +890,6 @@ public class CharacterLocomotion : MonoBehaviour
     /// <param name="input">Input</param>
     public void SetInput(CharacterInput input)
     {
-        input.Direction = Vector3.right;
         this._input = input;
     }
 
