@@ -1,12 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[System.Serializable]
 public class IntVector3
 {
     #region Variables (private)
 
+    [SerializeField]
     private int _x;
+    [SerializeField]
     private int _y;
+    [SerializeField]
     private int _z;
 
     #endregion
@@ -95,11 +99,6 @@ public class IntVector3
         return vector.ToString();
     }
     
-    public static bool operator !=(IntVector3 v1, IntVector3 v2)
-    {
-        return !(v1 == v2);
-    }
-
     public static bool operator ==(IntVector3 v1, IntVector3 v2)
     {
         if (object.ReferenceEquals(v1, null))
@@ -110,11 +109,31 @@ public class IntVector3
         return v1.Equals(v2);
     }
 
-    public override bool Equals(object obj)
+    public static bool operator !=(IntVector3 v1, IntVector3 v2)
+    {
+        return !(v1 == v2);
+    }
+    
+    public override bool Equals(System.Object obj)
     {
         if (obj == null) return false;
-        var v = (IntVector3)obj;
-        return this.x == v.x && this.y == v.y && this.z == v.z;
+
+        var v = obj as IntVector3;
+        if ((System.Object)v == null) return false;
+
+        return (this.x == v.x) && (this.y == v.y) && (this.z == v.z);
+    }
+
+    public bool Equals(IntVector3 v)
+    {
+        if ((object)v == null) return false;
+
+        return (this.x == v.x) && (this.y == v.y) && (this.z == v.z);
+    }
+
+    public override int GetHashCode()
+    {
+        return this.x ^ this.y ^ this.z;//base.GetHashCode();
     }
 
     public static IntVector3 zero { get { return new IntVector3(0, 0, 0); } }

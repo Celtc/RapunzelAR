@@ -92,7 +92,7 @@ public class Level : MonoBehaviour
                             var charID = int.Parse(currEntry) - 1;
 
                             // Instancia el jugador
-                            SpawnCharacterAt(Index.Characters[charID], new IntVector3(x, y, z));
+                            SpawnCharacterAt(Index.Characters[charID], new IntVector3(x, y, z), true);
                         }
                         // Sino -> Posible Spawn de bloque
                         else
@@ -179,13 +179,20 @@ public class Level : MonoBehaviour
     }    
 
     /// <summary>
-    /// Spawnea un character en el mundo
+    /// Spawnea un character en el mundo. Si es un jugador lo asigna a las camaras.
     /// </summary>
     /// <param name="character">Character a spawner, se creara una instancia del mismo</param>
     /// <param name="pos">Posicion en donde hara spawn</param>
-    public static void SpawnCharacterAt(GameObject character, IntVector3 pos)
+    /// <param name="player">Jugador que sera seguido por las camaras</param>
+    public static void SpawnCharacterAt(GameObject character, IntVector3 pos, bool player = false)
     {
-        Instantiate(character, new Vector3(pos.x + .5f, pos.y, pos.z + .5f), Quaternion.identity);
+        var newChar = Instantiate(character, new Vector3(pos.x + .5f, pos.y, pos.z + .5f), Quaternion.identity) as GameObject;
+
+        if (player)
+        {
+            var cam = Camera.main;
+            cam.GetComponent<SmoothFollowAdvance>().SetTarget(newChar.transform);
+        }
     }
 
 	#endregion

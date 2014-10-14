@@ -272,7 +272,7 @@ public class CharacterLocomotion : MonoBehaviour
             }
 
             // Determina la posicion objetivo
-            var targetPos = Position + newInput;
+            var targetPos = Position + CustomMathf.RoundToIntVector(newInput);
             //Debug.Log(Position);
             //Debug.Log(targetPos);
 
@@ -298,6 +298,9 @@ public class CharacterLocomotion : MonoBehaviour
                 // Hay un cubo delante del lugar destino?
                 else if (Level.Grid.ExistsStillAt(targetPos + Direction))
                 {
+                    Debug.Log(Position);
+                    Debug.Log(Direction);
+                    Debug.Log(targetPos);
                     // Direccion de strafe
                     if (_input.Direction.x > 0)
                     {
@@ -452,6 +455,8 @@ public class CharacterLocomotion : MonoBehaviour
             // Lo orienta
             currDeltaPosition = startRotation * currDeltaPosition;
 
+            Debug.Log("Fraction: " + fraction.ToString() + "\n DeltaZ: " + (currDeltaPosition - deltaPosition).x.ToString());
+
             // Si es el ultimo frame de accion el posicionamiento es absoluto, sino relativo
             if (fraction == 1f)
             {
@@ -467,7 +472,7 @@ public class CharacterLocomotion : MonoBehaviour
                 deltaPosition = currDeltaPosition;
             }
 
-            #endregion
+            #endregion            
 
             #region Rotacion
 
@@ -783,6 +788,7 @@ public class CharacterLocomotion : MonoBehaviour
     /// <param name="input">Input</param>
     public void SetInput(CharacterInput input)
     {
+        input.Direction = Vector3.right;
         this._input = input;
     }
 
