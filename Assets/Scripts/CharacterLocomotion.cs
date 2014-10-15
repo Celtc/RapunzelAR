@@ -10,10 +10,11 @@ public class CharacterLocomotion : MonoBehaviour
 
     [SerializeField]
     private float _runSpeed = 3f;
-
     [SerializeField]
     private float _generalSpeed = 1f;
-
+    [SerializeField]
+    private float _fallingSpeed = 3f;
+    
     [SerializeField]
     private List<ActionData> _actionsData;
     private Dictionary<string, ActionData> _actionsHash;
@@ -36,6 +37,12 @@ public class CharacterLocomotion : MonoBehaviour
     {
         get { return _runSpeed; }
         set { _runSpeed = value; }
+    }
+
+    public float FallingSpeed
+    {
+        get { return _fallingSpeed; }
+        set { _fallingSpeed = value; }
     }
 
     public IntVector3 Position
@@ -75,9 +82,18 @@ public class CharacterLocomotion : MonoBehaviour
     {
         // En caso de que este inactivo, permite el comienzo de una nueva accion
         if (IsInactive())
-            StartAction();
-    }
+        {
+            if (!GravityCheck())
+                StartAction();
+        }
 
+        // Esta cayendo
+        else if (IsFalling())
+        {
+            FallingManagement();
+        }
+    }
+    
     #endregion
 
     #region Metodos privados
@@ -98,6 +114,39 @@ public class CharacterLocomotion : MonoBehaviour
         {
             _actionsHash.Add(_actionsData[i].Name, _actionsData[i]);
         }
+    }
+
+    /// <summary>
+    /// Determina si el character debe caer o no, y si corresponde comienza la caida
+    /// </summary>
+    /// <returns>Verdadero en caso de comenzar a caer</returns>
+    private bool GravityCheck()
+    {
+        var falling = false;
+
+        // Si en estados donde se apoya sobre sus pies
+        if (_state == State.Standing || _state == State.Gripping)
+        {
+            if (!Level.Grid.ExistsAt(Position - Vector3.up))
+            {
+                Debug.Log("Accion: Cayendo");
+                falling = true;
+                Fall();
+            }
+        }
+
+        // Si esta sostenido de un bloque
+        else if (_state == State.Hanging)
+        {
+            if (!Level.Grid.ExistsAt(Position + Direction))
+            {
+                Debug.Log("Accion: Cayendo");
+                falling = true;
+                HangToFall();
+            }
+        }
+
+        return falling;
     }
 
     /// <summary>
@@ -180,6 +229,43 @@ public class CharacterLocomotion : MonoBehaviour
         _input.Empty();
     }
 
+    /// <summary>
+    /// Determina la acciones automaticas (no dependen del input) que ocurren en plena caida
+    /// </summary>
+    private void FallingManagement()
+    {
+        // Determina la posicion objetivo
+        var underPos = Position - Vector3.up;
+        
+        // Si no hay bloques debajo
+        if (!Level.Grid.ExistsStillAt(underPos))
+        {
+            // Hay un hueco enfrente donde se puede agarrar
+            if (!Level.Grid.ExistsStillAt(Position + Direction) &&
+                Level.Grid.ExistsStillAt(underPos + Direction))
+            {
+                Debug.Log("Cayendo -> Agarrandose");
+                FallToHang();
+            }
+
+            // No hay bloques de donde agarrarse
+            else
+            {
+                Fall();
+            }
+        }
+
+        // Hay un bloque debajo
+        else
+        {
+            Debug.Log("Cayendo -> Aterrizando");
+            Land();
+        }
+    }
+
+    /// <summary>
+    /// Administra las acciones de agarrar un bloque
+    /// </summary>
     private void GrippingManagement()
     {
         // Determina la posicion objetivo
@@ -251,15 +337,29 @@ public class CharacterLocomotion : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Administra las acciones estando colgado
+    /// </summary>
     private void HangingManagement()
     {
-        // Hay input del boton de agarre
+        // Boton de agarre
         if (_input.BtnA)
         {
-            Hang();
+            // Hay bloque debajo
+            if (Level.Grid.ExistsStillAt(Position - Vector3.up))
+            {
+                Debug.Log("Accion: Descolgando");
+                HangDrop();
+            }
+            // No hay bloque debajo
+            else
+            {
+                Debug.Log("Accion: Colgando -> Caer");
+                HangToFall();
+            }
         }
-        // Hay input de direccion unicamente
-        else
+        // Desplazamiento
+        else if (_input.Direction != null)
         {
             // Transforma el input (da prioridad al input vertical)    
             var newInput = new Vector3(0, _input.Direction.z, 0);
@@ -273,8 +373,6 @@ public class CharacterLocomotion : MonoBehaviour
 
             // Determina la posicion objetivo
             var targetPos = Position + CustomMathf.RoundToIntVector(newInput);
-            //Debug.Log(Position);
-            //Debug.Log(targetPos);
 
             // Desplazamiento horizontal
             if (newInput.y == 0 && newInput.x != 0)
@@ -298,9 +396,6 @@ public class CharacterLocomotion : MonoBehaviour
                 // Hay un cubo delante del lugar destino?
                 else if (Level.Grid.ExistsStillAt(targetPos + Direction))
                 {
-                    Debug.Log(Position);
-                    Debug.Log(Direction);
-                    Debug.Log(targetPos);
                     // Direccion de strafe
                     if (_input.Direction.x > 0)
                     {
@@ -323,28 +418,35 @@ public class CharacterLocomotion : MonoBehaviour
                         Debug.Log("Accion: Colgando -> Giro Derecha Convexo");
                         HangRightConvexe();
                     }
-                    else if (!Level.Grid.ExistsStillAt(targetPos + Direction + Vector3.up))
+                    else if (_input.Direction.x < 0 && 
+                        !Level.Grid.ExistsStillAt(targetPos + Direction + Vector3.up))
                     {
                         Debug.Log("Accion: Colgando -> Giro Izquierda Convexo");
                         HangLeftConvexe();
                     }
-
+                    else
+                    {
+                        Hang();
+                    }
                 }
             }
 
             // Desplazamiento vertical
             else if (newInput.y != 0)
             {
+                // Input: arriba, y no hay bloque que lo impida -> sube
                 if (newInput.y == 1 && !Level.Grid.ExistsStillAt(targetPos + Direction))
                 {
                     Debug.Log("Accion: Colgando -> Subir");
                     HangUp();
                 }
+                // Input: abajo, y hay un bloque debajo -> descuelga
                 else if (newInput.y == -1 && Level.Grid.ExistsStillAt(targetPos))
                 {
-                    Debug.Log("Accion: Colgando -> Caer");
+                    Debug.Log("Accion: Descolgando");
                     HangDrop();
                 }
+                // Queda colgado
                 else
                 {
                     Hang();
@@ -353,6 +455,9 @@ public class CharacterLocomotion : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Administra las acciones de desplazamiento, horizontal y/o vertical
+    /// </summary>
     private void LocomotionManagement()
     {
         // Si no esta orientado, gira
@@ -377,6 +482,13 @@ public class CharacterLocomotion : MonoBehaviour
                 // Trepa
                 Debug.Log("Accion: Trepando");
                 Climb();
+            }
+
+            // Sino puede trepar
+            else
+            {
+                // Se queda parado
+                Stand();
             }
         }
 
@@ -680,7 +792,7 @@ public class CharacterLocomotion : MonoBehaviour
         _mecanim.SetFloat("RunSpeed", _runSpeed / transform.localScale.x);
 
         // Inicia la rutina de la accion. Se le indica que una vez finalizada la tarea vuelva a la velocidad general
-        StartCoroutine(DoFixedAction(_actionsHash["Run"], State.Moving, State.Standing, _runSpeed, delegate { _mecanim.SetSpeed(_generalSpeed); }));
+        StartCoroutine(DoAction(_actionsHash["Run"], State.Moving, State.Standing, _runSpeed, delegate { _mecanim.SetSpeed(_generalSpeed); }));
     }
 
     private void Climb()
@@ -869,6 +981,46 @@ public class CharacterLocomotion : MonoBehaviour
         StartCoroutine(DoAction(_actionsHash["HangDrop"], State.Moving, State.Standing, _generalSpeed));
     }
 
+    private void HangToFall()
+    {
+        // Confugiracion de mecanim
+        _mecanim.SetTrigger("Fall");
+        _mecanim.SetSpeed(_generalSpeed);
+
+        // Inicia la rutina de la accion
+        StartCoroutine(DoAction(_actionsHash["HangToFall"], State.Moving, State.Falling, _fallingSpeed));
+    }
+
+    private void Fall()
+    {
+        // Confugiracion de mecanim
+        _mecanim.SetTrigger("Fall", "Fall");
+        _mecanim.SetSpeed(_generalSpeed);
+
+        // Inicia la rutina de la accion
+        StartCoroutine(DoAction(_actionsHash["Fall"], State.Moving, State.Falling, _fallingSpeed));
+    }
+
+    private void FallToHang()
+    {
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("Hanging");
+        _mecanim.SetSpeed(_generalSpeed);
+
+        // Inicia la rutina de la accion
+        StartCoroutine(DoAction(_actionsHash["FallToHang"], State.Moving, State.Hanging, _fallingSpeed));
+    }
+
+    private void Land()
+    {
+        // Confugiracion de mecanim
+        _mecanim.SetFlag("Land");
+        _mecanim.SetSpeed(_generalSpeed);
+
+        // Inicia la rutina de la accion
+        StartCoroutine(DoAction(_actionsHash["Land"], State.Moving, State.Standing, _generalSpeed));
+    }
+
     #endregion
 
     #endregion
@@ -885,11 +1037,21 @@ public class CharacterLocomotion : MonoBehaviour
     }
 
     /// <summary>
+    /// Determina si el character esta en accion de caida
+    /// </summary>
+    /// <returns></returns>
+    public bool IsFalling()
+    {
+        return _state == State.Falling;
+    }
+
+    /// <summary>
     /// Establece el input que determinara el accionar del character
     /// </summary>
     /// <param name="input">Input</param>
     public void SetInput(CharacterInput input)
     {
+        //input.Direction = Vector3.right;
         this._input = input;
     }
 

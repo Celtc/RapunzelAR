@@ -1961,6 +1961,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _runSpeed: 3
   _generalSpeed: 1.60000002
+  _fallingSpeed: 5
   _actionsData:
   - _name: Standing
     _duration: 0
@@ -2968,6 +2969,148 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
     _rootMotion: 1
+  - _name: HangToFall
+    _duration: .275000006
+    _deltaX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaY:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: -.274999797
+        outSlope: -.274999797
+        tangentMode: 10
+      - time: 1.00000012
+        value: -.274999827
+        inSlope: -.274999797
+        outSlope: -.274999797
+        tangentMode: 10
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaZ:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: -.300000876
+        outSlope: -.300000876
+        tangentMode: 10
+      - time: 1
+        value: -.300000876
+        inSlope: -.300000876
+        outSlope: 1.04426265
+        tangentMode: 5
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaR:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _rootMotion: 0
+  - _name: Fall
+    _duration: 1
+    _deltaX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaY:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: -.0616016388
+        inSlope: 1
+        outSlope: -.938398361
+        tangentMode: 17
+      - time: 1
+        value: -1
+        inSlope: -.938398361
+        outSlope: 0
+        tangentMode: 21
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaR:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _rootMotion: 0
+  - _name: FallToHang
+    _duration: .725000024
+    _deltaX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaY:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: -.0416837782
+        inSlope: 1
+        outSlope: -.683316231
+        tangentMode: 17
+      - time: 1
+        value: -.725000024
+        inSlope: -.637261093
+        outSlope: -.637261093
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaZ:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: .300000012
+        outSlope: .300000012
+        tangentMode: 10
+      - time: 1
+        value: .300000012
+        inSlope: .300000012
+        outSlope: 1.04426265
+        tangentMode: 5
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaR:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _rootMotion: 0
+  - _name: Land
+    _duration: 1.15999997
+    _deltaX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _deltaR:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+    _rootMotion: 0
 --- !u!114 &11400004
 MonoBehaviour:
   m_ObjectHideFlags: 1

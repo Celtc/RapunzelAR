@@ -169,6 +169,37 @@ public class CharacterMecanimController : MonoBehaviour
     }
 
     /// <summary>
+    /// Activa un trigger
+    /// </summary>
+    /// <param name="triggerName">Nombre del trigger</param>
+    public void SetTrigger(string triggerName)
+    {
+        _dirtyFlags = true;
+
+        if (_mode == MecanimMode.SingleActive)
+            ResetFlags();
+
+        _animator.SetTrigger(triggerName);
+    }
+
+    /// <summary>
+    /// Activa un trigger si no se encuentra ya en el estado deseado
+    /// </summary>
+    /// <param name="triggerName">Nombre del trigger</param>
+    /// <param name="wantedState">Nombre del estado</param>
+    public void SetTrigger(string triggerName, string wantedState)
+    {
+        if (_animator.GetCurrentAnimatorStateInfo(0).IsName(wantedState)) return;
+
+        _dirtyFlags = true;
+
+        if (_mode == MecanimMode.SingleActive)
+            ResetFlags();
+
+        _animator.SetTrigger(triggerName);
+    }
+
+    /// <summary>
     /// Establece el valor de una variable float
     /// </summary>
     /// <param name="name">Nombre de la variable</param>

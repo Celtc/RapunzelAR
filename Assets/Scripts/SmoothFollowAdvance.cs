@@ -26,8 +26,6 @@ public class SmoothFollowAdvance : MonoBehaviour
     [SerializeField]
     private float _rotationDamping = 3.0f;
 
-    private Vector3 _initialRotation;
-
 	#endregion
 
 	#region Propiedades (public)
@@ -41,7 +39,7 @@ public class SmoothFollowAdvance : MonoBehaviour
     /// </summary>
     void Start()
     {
-        _initialRotation = transform.eulerAngles;
+
     }
 
 	/// <summary>
