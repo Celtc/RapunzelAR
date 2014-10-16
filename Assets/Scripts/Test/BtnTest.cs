@@ -1,13 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class BtnTest : MonoBehaviour 
 {
 	#region Variables (private)
-
-    [SerializeField]
-    private GameObject playerModel;
-
+        
 	#endregion
 
 	#region Properties (public)
@@ -34,8 +32,6 @@ public class BtnTest : MonoBehaviour
 
     void OnMouseDown()
     {
-        Destroy(GameObject.FindGameObjectWithTag("Player"));
-        Level.SpawnCharacterAt(Index.Characters[0], new IntVector3(8, 1, 8));
     }
 
     void OnMouseUp()
@@ -48,7 +44,7 @@ public class BtnTest : MonoBehaviour
     {
         Level.Load("test");
     }
-
+    
 	#endregion
 
 	#region Methods

@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 public class Grid
 {
@@ -17,6 +19,9 @@ public class Grid
 
     // Grilla de bloques
     private Block[, ,] _blocksGrid = new Block[_GRIDSIZE_X, _GRIDSIZE_Y, _GRIDSIZE_Z];
+
+    // Lista de characters presentes en la grilla
+    private List<Character> _characters = new List<Character>();
 
     // Diccionario para facilitar el acceso utilizando indices (independientemente de la posicion de los bloques)
     private Dictionary<Block, IntVector3> _blocksHash = new Dictionary<Block, IntVector3>(_GRIDSIZE_X * _GRIDSIZE_Y * _GRIDSIZE_Z);
@@ -41,11 +46,19 @@ public class Grid
         }
     }
 
-    public Block[, ,] AllBlocks
+    public ReadOnlyCollection<Block> AllBlocks
     {
         get
         {
-            return _blocksGrid.Clone() as Block[, ,];
+            return _blocksHash.Keys.ToList().AsReadOnly();
+        }
+    }
+
+    public ReadOnlyCollection<Character> AllCharacters
+    {
+        get
+        {
+            return _characters.AsReadOnly();
         }
     }
 
@@ -79,16 +92,36 @@ public class Grid
     #region Metodos publicos
 
     /// <summary>
+    /// Agrega un character a la lista
+    /// </summary>
+    /// <param name="character">GameObject que constituye el character</param>
+    public void AddCharacter(Character character)
+    {
+        // Agrega el character a la lista
+        _characters.Add(character);
+    }
+
+    /// <summary>
+    /// Remueve un character de la lista
+    /// </summary>
+    /// <param name="character">GameObject que constituye el character</param>
+    public void RemoveCharacter(Character character)
+    {
+        // Lo saca de la lista
+        _characters.Remove(character);
+    }
+
+    /// <summary>
     /// Agrega un bloque a la grilla
     /// </summary>
     /// <param name="block"></param>
     public void AddBlock(Block block)
     {  
         // Guarda el bloque en la matriz
-        SetAt(block.position, block);
+        SetAt(block.Position, block);
 
         // Lo almacena en la hashTable
-        _blocksHash.Add(block, block.position);
+        _blocksHash.Add(block, block.Position);
     }
 
     /// <summary>
@@ -98,7 +131,7 @@ public class Grid
     public void RemoveBlock(Block block)
     {
         // Vacia las entradas
-        SetAt(block.position, null);
+        SetAt(block.Position, null);
         _blocksHash.Remove(block);
     }
 
@@ -129,7 +162,7 @@ public class Grid
 
         // Obtiene la antigua y nueva posicion
         var from = _blocksHash[block];
-        var to = block.position;
+        var to = block.Position;
 
         // Si no hay un cambio de posicion, omite mover indices
         if (from != to)

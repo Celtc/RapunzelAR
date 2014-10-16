@@ -16,7 +16,7 @@ public class Index : MonoBehaviour
     [SerializeField]
     private List<Block> _blocks = new List<Block>();
     [SerializeField]
-    private List<GameObject> _characters = new List<GameObject>();
+    private List<Character> _characters = new List<Character>();
 
 	#endregion
 
@@ -47,7 +47,7 @@ public class Index : MonoBehaviour
         }
     }
 
-    public static List<GameObject> Characters
+    public static List<Character> Characters
     {
         get
         {
@@ -71,6 +71,60 @@ public class Index : MonoBehaviour
 	#endregion
 
 	#region Metodos
+
+    public static int IndexOfBlock<T>()
+    {
+        for (int i = 0; i < _instance._blocks.Count; i++)
+        {
+            if (_instance._blocks[i].GetType() == typeof(T))
+            {
+                return i;
+            }
+        }
+
+        throw new MissingMemberException();
+    }
+
+    public static int IndexOfBlock(Type blockType)
+    {
+        for (int i = 0; i < _instance._blocks.Count; i++)
+        {
+            if (_instance._blocks[i].GetType() == blockType)
+            {
+                return i;
+            }
+        }
+
+        throw new MissingMemberException();
+    }
+
+    public static int IndexOfCharacter<T>()
+    {
+        for (int i = 0; i < _instance._characters.Count; i++)
+        {
+            if (_instance._characters[i].GetType() == typeof(T))
+            {
+                return i;
+            }
+        }
+
+        throw new MissingMemberException();
+    }
+
+    public static int IndexOfCharacter(Type characterType)
+    {
+        for (int i = 0; i < _instance._characters.Count; i++)
+        {
+            if (_instance._characters[i].GetType() == characterType)
+            {
+                return i;
+            }
+        }
+
+        throw new MissingMemberException();
+    }
+
+
 
 	#endregion
 }

@@ -8,7 +8,8 @@ public class Level : MonoBehaviour
 {
 	#region Variables (private)
 
-    private static Grid _grid;
+    private static GridOriginator _gridOriginator;
+    private static GridCaretaker _gridCaretaker;
     
 	#endregion
 
@@ -18,7 +19,7 @@ public class Level : MonoBehaviour
     {
         get
         {
-            return _grid;
+            return _gridOriginator.Grid;
         }
     }
 
@@ -39,7 +40,7 @@ public class Level : MonoBehaviour
 	/// </summary>
 	void Start ()	
 	{
-	
+
 	}
 
 	/// <summary>
@@ -54,69 +55,6 @@ public class Level : MonoBehaviour
 
     #region Metodos privados
     
-    /// <summary>
-    /// Instancia un nivel
-    /// </summary>
-    /// <param name="level">Asset del nivel a cargar</param>
-    private static void InstantiateLevel(TextAsset level)
-    {
-        // Crea la grilla
-        _grid = new Grid();
-
-        // Parsea el nivel
-        var strReader = new StringReader(level.text);
-        for (int y = 0; y < 40; y++)
-        {
-            for (int z = 0; z < 20; z++)
-            {
-                var line = strReader.ReadLine();
-                for (int x = 0; x < 20; x++)
-                {
-                    // Lee el caracter en la pos X (omite las comas)
-                    List<string> entries = line.Split(',').ToList<string>();
-                    var currEntry = entries[x];
-
-                    // Si no es 0 hay algo
-                    if (currEntry != "0")
-                    {
-                        // Si es una M -> Meta a llegar
-                        if (currEntry == "M")
-                        {
-
-                        }
-                        // Si inicia con una P -> Spawn de jugador
-                        else if (currEntry.StartsWith("P"))
-                        {
-                            // ID
-                            currEntry = currEntry.Substring(1);
-                            var charID = int.Parse(currEntry) - 1;
-
-                            // Instancia el jugador
-                            SpawnCharacterAt(Index.Characters[charID], new IntVector3(x, y, z), true);
-                        }
-                        // Sino -> Posible Spawn de bloque
-                        else
-                        {
-                            // Flag de bloque base? (no aplica gravedad)
-                            var baseFlag = currEntry.StartsWith("B");
-                            if (baseFlag)
-                                currEntry = currEntry.Substring(1);
-
-                            // Indice
-                            var blockIndex = int.Parse(currEntry) - 1;
-
-                            // Spawnea el bloque
-                            Level.SpawnBlockAt(new IntVector3(x, y, z), Index.Blocks[blockIndex], baseFlag);
-                        }
-                    }
-                }
-            }
-
-            // Descarta la linea vacia entre niveles de Y
-            strReader.ReadLine();
-        }
-    }
-
     #endregion
 
     #region Metodos publicos
@@ -131,7 +69,7 @@ public class Level : MonoBehaviour
         if (level)
         {
             Debug.Log("Cargando el nivel \"" + levelName + "\"");
-            InstantiateLevel(level);
+            Load(new LevelParser(level));
         }
         else
         {
@@ -140,12 +78,47 @@ public class Level : MonoBehaviour
     }
 
     /// <summary>
-    /// Carga un nivel, cargando los elementos del mismo y generando su grilla
+    /// Carga un nivel, cargando un memento del mismo
     /// </summary>
-    /// <param name="levelID">ID del nivel a cargar</param>
-    public static void Load(int levelID)
+    /// <param name="gridMemento"></param>
+    public static void Load(GridMemento gridMemento)
     {
-        InstantiateLevel(Index.Levels[levelID]);
+        // Instancia las clases de memento si no estaban instanciadas
+        if (_gridOriginator == null) _gridOriginator = new GridOriginator();
+        if (_gridCaretaker == null) _gridCaretaker = new GridCaretaker(10);
+
+        // Spawnea los bloques
+        foreach (var blockState in gridMemento.BlocksState)
+        {
+            Level.SpawnBlock(blockState);
+        }
+
+        // Spawnea los characters
+        foreach (var charState in gridMemento.CharactersState)
+        {
+            Level.SpawnCharacter(charState, true);
+        }
+    }
+
+    /// <summary>
+    /// Descarga el nivel, destruyendo todos los bloques y characters y limpiando la grilla
+    /// </summary>
+    public static void Unload()
+    {
+        // Destruye todos los bloques
+        foreach(var block in _gridOriginator.Grid.AllBlocks)
+        {
+            Destroy(block.gameObject);
+        }
+
+        // Destruye todos los characters
+        foreach (var character in _gridOriginator.Grid.AllCharacters)
+        {
+            Destroy(character.gameObject);
+        }
+
+        // Destruye la grilla
+        _gridOriginator.Clear();
     }
 
     /// <summary>
@@ -154,9 +127,9 @@ public class Level : MonoBehaviour
     /// <param name="pos">Posicion en donde hara spawn</param>
     /// <param name="blockID">ID del tipo de bloque a spawnear (Index)</param>
     /// <param name="basement">Flag que determina si el cubo es inamovible</param>
-    public static void SpawnBlockAt(IntVector3 pos, int blockID, bool basement = false)
+    public static void SpawnBlockAt(int blockID, IntVector3 pos, bool basement = false)
     {
-        SpawnBlockAt(pos, Index.Blocks[blockID], basement);
+        SpawnBlockAt(Index.Blocks[blockID], pos, basement);
     }
 
     /// <summary>
@@ -165,18 +138,34 @@ public class Level : MonoBehaviour
     /// <param name="pos">Posicion en donde hara spawn</param>
     /// <param name="block">Bloque a spawnear, se creara una instancia del mismo</param>
     /// <param name="basement">Flag que determina si el cubo es inamovible</param>
-    public static void SpawnBlockAt(IntVector3 pos, Block block, bool basement = false)
+    public static void SpawnBlockAt(Block block, IntVector3 pos, bool basement = false)
     {
         // Instancia el bloque
         var instancedBlock = ((GameObject)Instantiate(block.gameObject, Vector3.zero, Quaternion.identity)).GetComponent<Block>();
 
         // Lo ubica y asigna flag de basement
-        instancedBlock.position = pos;
+        instancedBlock.SetPosition(pos);
         instancedBlock.isBasement = basement;
 
-        // Lo agrea al grid
-        _grid.AddBlock(instancedBlock);
+        // Lo agrega al grid
+        _gridOriginator.Grid.AddBlock(instancedBlock);
     }    
+
+    /// <summary>
+    /// Spawnea un bloque con un determinado estado
+    /// </summary>
+    /// <param name="blockState">Estado del bloque</param>
+    public static void SpawnBlock(BlockState blockState)
+    {
+        // Instancia el bloque
+        var instancedBlock = ((GameObject)Instantiate(Index.Blocks[blockState.IndexType].gameObject, Vector3.zero, Quaternion.identity)).GetComponent<Block>();
+
+        // Asigna el estado
+        instancedBlock.SetState(blockState);
+
+        // Lo agrea al grid
+        _gridOriginator.Grid.AddBlock(instancedBlock);
+    }
 
     /// <summary>
     /// Spawnea un character en el mundo. Si es un jugador lo asigna a las camaras.
@@ -184,15 +173,79 @@ public class Level : MonoBehaviour
     /// <param name="character">Character a spawner, se creara una instancia del mismo</param>
     /// <param name="pos">Posicion en donde hara spawn</param>
     /// <param name="player">Jugador que sera seguido por las camaras</param>
-    public static void SpawnCharacterAt(GameObject character, IntVector3 pos, bool player = false)
+    public static void SpawnCharacterAt(int characterID, IntVector3 pos, bool player = false)
     {
-        var newChar = Instantiate(character, new Vector3(pos.x + .5f, pos.y, pos.z + .5f), Quaternion.identity) as GameObject;
+        SpawnCharacterAt(Index.Characters[characterID], pos, player);
+    }
 
-        if (player)
+    /// <summary>
+    /// Spawnea un character en el mundo. Si es un jugador lo asigna a las camaras.
+    /// </summary>
+    /// <param name="character">Character a spawner, se creara una instancia del mismo</param>
+    /// <param name="pos">Posicion en donde hara spawn</param>
+    /// <param name="player">Jugador que sera seguido por las camaras</param>
+    public static void SpawnCharacterAt(Character character, IntVector3 pos, bool player = false)
+    {
+        // Instancia el character
+        var instancedCharacter = ((GameObject)Instantiate(character.gameObject, Vector3.zero, Quaternion.identity)).GetComponent<Character>();
+
+        // Lo ubica
+        instancedCharacter.SetPosition(pos);
+
+        // Si es un character jugable lo targetea con la camara
+        if (instancedCharacter.tag == "Player")
         {
-            var cam = Camera.main;
-            cam.GetComponent<SmoothFollowAdvance>().SetTarget(newChar.transform);
+            Camera.main.GetComponent<SmoothFollowAdvance>().SetTarget(instancedCharacter.transform);
         }
+        
+        // Lo agrega al grid
+        _gridOriginator.Grid.AddCharacter(instancedCharacter.GetComponent<Character>());
+    }
+
+    /// <summary>
+    /// Spawnea un character con un determinado estado
+    /// </summary>
+    /// <param name="characterState">Estado del character</param>
+    /// <param name="player">Jugador que sera seguido por las camaras</param>
+    public static void SpawnCharacter(CharacterState characterState, bool player = false)
+    {
+
+        // Instancia el character
+        var instancedCharacter = ((GameObject)Instantiate(Index.Characters[characterState.IndexType].gameObject, Vector3.zero, Quaternion.identity)).GetComponent<Character>();
+
+        // Asigna el estado
+        instancedCharacter.SetState(characterState);
+
+        // Si es un character jugable lo targetea con la camara
+        if (instancedCharacter.tag == "Player")
+        {
+            Camera.main.GetComponent<SmoothFollowAdvance>().SetTarget(instancedCharacter.transform);
+        }
+
+        // Lo agrega al grid
+        _gridOriginator.Grid.AddCharacter(instancedCharacter.GetComponent<Character>());
+    }
+
+    /// <summary>
+    /// Guarda el estado de la grilla
+    /// </summary>
+    public static void SaveState()
+    {
+        _gridCaretaker.Push(_gridOriginator.CreateMemento());
+    }
+
+    /// <summary>
+    /// Carga un estado previo
+    /// </summary>
+    public static void LoadPreviousState()
+    {
+        //TODO: Esto deberia hacerse con NGUI
+        var gridMemento = _gridCaretaker.Pop();
+        if (gridMemento == null) return;
+
+        var sFader = Camera.main.GetComponent<ScreenFader>();
+        sFader.Action = () => _gridOriginator.SetMemento(gridMemento);
+        sFader.FadeInOut();
     }
 
 	#endregion

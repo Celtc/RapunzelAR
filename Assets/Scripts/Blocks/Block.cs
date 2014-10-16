@@ -29,16 +29,12 @@ public class Block : MonoBehaviour
 
     #region Propiedades (public)
     
-    public IntVector3 position
+    public IntVector3 Position
     {
-        get { return transform.position; }
-        set { transform.position = new Vector3(value.x + .5f, value.y + .5f, value.z + .5f); }
-    }
-
-    public Vector3 exactPosition
-    {
-        get { return new Vector3(transform.position.x - .5f, transform.position.y, transform.position.z - .5f); }
-        private set { transform.position = new Vector3(value.x + .5f, value.y + .5f, value.z + .5f); }
+        get
+        {
+            return CustomMathf.RoundToIntVector(new Vector3(transform.position.x - .5f, transform.position.y - .5f, transform.position.z - .5f));
+        }
     }
 
     public float moveTime
@@ -103,6 +99,18 @@ public class Block : MonoBehaviour
 
     #region Metodos privados
 
+    /// <summary>
+    /// Reinicia los flas de estados
+    /// </summary>
+    protected void ResetState()
+    {
+        this._isFalling = false;
+        this._isMoving = false;
+    }
+
+    /// <summary>
+    /// Determina si el bloque esta temblando o cayendo, y activa los respectivos flags.
+    /// </summary>
     protected void GravityCheck()
     {
         _isShaking = false;
@@ -152,7 +160,7 @@ public class Block : MonoBehaviour
 
         // Determina si hay otro cubo implicado en el movimiento
         // El tiempo en moverlos sera el mayor de todos (una cadena es tan fuerte como el mas debil de sus eslabones)
-        var chainCube = Level.Grid[position + direction];
+        var chainCube = Level.Grid[Position + direction];
         if (chainCube != null)
             moveTime = chainCube.MoveBlock(direction, moveTime);
 
@@ -173,6 +181,9 @@ public class Block : MonoBehaviour
         StartCoroutine(TranslateRoutine(from, to, duration, postAction));
     }
 
+    /// <summary>
+    /// Rutina interna invocada por Translate()
+    /// </summary>
     protected IEnumerator TranslateRoutine(IntVector3 from, IntVector3 to, float duration, Action postAction)
     {
         this._isMoving = true;
@@ -180,6 +191,10 @@ public class Block : MonoBehaviour
         // Variables temporales
         var fraction = 0f;
         var elapsedTime = -Time.deltaTime;
+
+        // Pasaje posiciones enteras a exactas para manejo de la animacion
+        var fFrom = new Vector3(from.x + .5f, from.y + .5f, from.z + .5f);
+        var fTo = new Vector3(to.x + .5f, to.y + .5f, to.z + .5f);
         
         // Mientras que el tiempo sea menor a la duracion
         while (elapsedTime < duration)
@@ -189,7 +204,7 @@ public class Block : MonoBehaviour
 
             // Realiza el lerp
             fraction = Mathf.Clamp01(elapsedTime / duration);
-            exactPosition = Vector3.Lerp(from, to, fraction);
+            transform.position = Vector3.Lerp(fFrom, fTo, fraction);
 
             // Espera al siguiente frame (solo si no termino de moverse)
             if (fraction < 1f) yield return 0;
@@ -205,18 +220,24 @@ public class Block : MonoBehaviour
         this._isMoving = false;
     }
     
+    /// <summary>
+    /// Accion de caer 1 posicion
+    /// </summary>
     protected void Fall()
     {
         if (!isMoving)
         {
-            var from = position;
-            var to = position - Vector3.up;
+            var from = Position;
+            var to = Position - Vector3.up;
             Translate(from, to, 1f / _fallingSpeed,
                 (to.y == 0) ? (Action)(() => { _isBasement = true; }) : null
             );
         }
     }
 
+    /// <summary>
+    /// Accion de temblar durante "shakingTime" segundos
+    /// </summary>
     protected void Shake()
     {
         if (!_shakingRoutine)
@@ -225,6 +246,9 @@ public class Block : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Rutina interna invocada por Shake()
+    /// </summary>
     protected IEnumerator ShakeRoutine()
     {
         _shakingRoutine = true;
@@ -252,6 +276,10 @@ public class Block : MonoBehaviour
         _shakingRoutine = false;
     }
     
+    /// <summary>
+    /// Obtiene todos los bloques que sostienen este bloque
+    /// </summary>
+    /// <returns>Lista de bloques soporte</returns>
     protected List<Block> SupportingBlocks()
     {
         var blocks = new List<Block>();
@@ -277,6 +305,11 @@ public class Block : MonoBehaviour
         return blocks;
     }
 
+    /// <summary>
+    /// Dada la lista de bloques que soportan el bloque, determina si este bloque esta firme o temblando
+    /// </summary>
+    /// <param name="blocks">Lista de bloques soporte</param>
+    /// <returns>Verdadero si este bloque esta temblando</returns>
     protected bool SupportIsShaking(List<Block> blocks)
     {
         return !blocks.Exists(x => !x._isShaking);
@@ -287,6 +320,17 @@ public class Block : MonoBehaviour
     #region Metodos publicos
     
     /// <summary>
+    /// Establece una nueva posicion para el bloque. Cualquier flag de shake o falling son reseteados.
+    /// </summary>
+    /// <param name="pos"></param>
+    public void SetPosition(IntVector3 pos)
+    {
+        transform.position = new Vector3(pos.x + .5f, pos.y + .5f, pos.z + .5f);
+
+        ResetState();
+    }
+
+    /// <summary>
     /// 
     /// </summary>
     /// <param name="fromPos"></param>
@@ -294,7 +338,7 @@ public class Block : MonoBehaviour
     public float Pushed(IntVector3 fromPos)
     {
         // Calcula la direccion y mueve el bloque
-        var direction = position - fromPos;
+        var direction = Position - fromPos;
         return MoveBlock(direction, _moveTime);
     }
 
@@ -306,9 +350,40 @@ public class Block : MonoBehaviour
     public float Pulled(IntVector3 fromPos)
     {
         // Calcula la direccion y mueve el bloque
-        var direction = fromPos - position;
+        var direction = fromPos - Position;
         return MoveBlock(direction, _moveTime);
     }
     
+    /// <summary>
+    /// Obtiene el estado interno del bloque
+    /// </summary>
+    /// <returns>Estado actual</returns>
+    public BlockState GetState()
+    {
+        var state = new BlockState(this.GetType());
+        state.Position = this.Position;
+        state.FallingSpeed = this._fallingSpeed;
+        state.ShakingSpeed = this._shakingSpeed;
+        state.ShakingTime = this._shakingTime;
+        state.IsBasement = this._isBasement;
+        state.MoveTime = this._moveTime;
+
+        return state;
+    }
+
+    /// <summary>
+    /// Asigna un nuevo estado al bloque
+    /// </summary>
+    /// <param name="state">Estado deseado</param>
+    public void SetState(BlockState state)
+    {
+        SetPosition(state.Position);
+        this._fallingSpeed = state.FallingSpeed;
+        this._shakingSpeed = state.ShakingSpeed;
+        this._shakingTime = state.ShakingTime;
+        this._isBasement = state.IsBasement;
+        this._moveTime = state.MoveTime;
+    }
+
     #endregion
 }

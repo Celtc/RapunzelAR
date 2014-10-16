@@ -17,6 +17,8 @@ GameObject:
   - 114: {fileID: 11400002}
   - 114: {fileID: 11400008}
   - 114: {fileID: 11400000}
+  - 114: {fileID: 11400010}
+  - 114: {fileID: 11400012}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -145,7 +147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fogMode: 0
-  startDistance: 200
+  startDistance: 10
   globalDensity: 1
   heightScale: 100
   height: 0
@@ -184,13 +186,50 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97b4768c3683045e4bfdb2e78272970c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  threshhold: .25
-  intensity: .75
+  threshhold: .200000003
+  intensity: .949999988
   blurSize: 1
   resolution: 0
   blurIterations: 1
   blurType: 0
   fastBloomShader: {fileID: 4800000, guid: 68a00c837b82e4c6d92e7da765dc5f1d, type: 3}
+--- !u!114 &11400010
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bef3d242a13c447ac90c2d2dc213b1ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mode: 0
+  intensity: 5.5
+  chromaticAberration: 6.80000019
+  axialAberration: .5
+  blur: 1
+  blurSpread: .75
+  luminanceDependency: .25
+  blurDistance: 2.5
+  vignetteShader: {fileID: 4800000, guid: 627943dc7a9a74286b70a4f694a0acd5, type: 3}
+  separableBlurShader: {fileID: 4800000, guid: e97c14fbb5ea04c3a902cc533d7fc5d1, type: 3}
+  chromAberrationShader: {fileID: 4800000, guid: 2b4f29398d9484ccfa9fd220449f5eee,
+    type: 3}
+--- !u!114 &11400012
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db6c70e62729e4149ad4905b0366b5c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _fadeSpeed: .25
+  _blackTexture: {fileID: 2800000, guid: 6bef2f1c90acd84409cd5276077b27c6, type: 3}
+  _alphaValue: 0
 --- !u!124 &12400000
 Behaviour:
   m_ObjectHideFlags: 1

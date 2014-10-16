@@ -4,28 +4,45 @@ using System.Collections;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(Animator))]
-public class CharacterLocomotion : MonoBehaviour
+public class Character : MonoBehaviour
 {
-    #region Variables (private)
+    #region Variables (privadas)
 
     [SerializeField]
-    private float _runSpeed = 3f;
+    protected float _life = 100f;
     [SerializeField]
-    private float _generalSpeed = 1f;
+    protected float _energy = 100f;
+
     [SerializeField]
-    private float _fallingSpeed = 3f;
+    protected float _runSpeed = 3f;
+    [SerializeField]
+    protected float _generalSpeed = 1f;
+    [SerializeField]
+    protected float _fallingSpeed = 3f;
     
     [SerializeField]
-    private List<ActionData> _actionsData;
-    private Dictionary<string, ActionData> _actionsHash;
+    protected List<ActionData> _actionsData;
+    protected Dictionary<string, ActionData> _actionsHash;
 
-    private State _state;
-    private CharacterInput _input;
-    private CharacterMecanimController _mecanim;
+    protected ActionState _actionState;
+    protected CharacterInput _input;
+    protected CharacterMecanimController _mecanim;
 
     #endregion
 
     #region Properties (public)
+
+    public float Life
+    {
+        get { return _life; }
+        set { _life = value; }
+    }
+
+    public float Energy
+    {
+        get { return _energy; }
+        set { _energy = value; }
+    }
 
     public float GeneralSpeed
     {
@@ -101,7 +118,7 @@ public class CharacterLocomotion : MonoBehaviour
     /// <summary>
     /// Genera la hashtable (diccionario) de las acciones
     /// </summary>
-    private void GenerateHashes()
+    protected void GenerateHashes()
     {
         if (_actionsHash == null)
         {
@@ -120,12 +137,12 @@ public class CharacterLocomotion : MonoBehaviour
     /// Determina si el character debe caer o no, y si corresponde comienza la caida
     /// </summary>
     /// <returns>Verdadero en caso de comenzar a caer</returns>
-    private bool GravityCheck()
+    protected bool GravityCheck()
     {
         var falling = false;
 
         // Si en estados donde se apoya sobre sus pies
-        if (_state == State.Standing || _state == State.Gripping)
+        if (_actionState == ActionState.Standing || _actionState == ActionState.Gripping)
         {
             if (!Level.Grid.ExistsAt(Position - Vector3.up))
             {
@@ -136,7 +153,7 @@ public class CharacterLocomotion : MonoBehaviour
         }
 
         // Si esta sostenido de un bloque
-        else if (_state == State.Hanging)
+        else if (_actionState == ActionState.Hanging)
         {
             if (!Level.Grid.ExistsAt(Position + Direction))
             {
@@ -153,10 +170,10 @@ public class CharacterLocomotion : MonoBehaviour
     /// Determina la acción a realizar. 
     /// Segun el input y las posibilidades a partir de los cubos que lo rodean.
     /// </summary>
-    private void StartAction()
+    protected void StartAction()
     {
         // Esta colgado
-        if (_state == State.Hanging)
+        if (_actionState == ActionState.Hanging)
         {
             // Si no hay input
             if (!_input.HasInput())
@@ -172,7 +189,7 @@ public class CharacterLocomotion : MonoBehaviour
         }
 
         // Esta agarrando un bloque
-        else if (_state == State.Gripping)
+        else if (_actionState == ActionState.Gripping)
         {
             // Si suelta el boton de agarre
             if (!_input.BtnA)
@@ -189,7 +206,7 @@ public class CharacterLocomotion : MonoBehaviour
         }
 
         // Esta parado
-        else if (_state == State.Standing)
+        else if (_actionState == ActionState.Standing)
         {
             // Si no hay input
             if (!_input.HasInput())
@@ -207,7 +224,7 @@ public class CharacterLocomotion : MonoBehaviour
                 }
 
                 // Sigue estando parado
-                if (_state == State.Standing)
+                if (_actionState == ActionState.Standing)
                 {
                     // Hay input de direccion
                     if (_input.Direction != null)
@@ -232,7 +249,7 @@ public class CharacterLocomotion : MonoBehaviour
     /// <summary>
     /// Determina la acciones automaticas (no dependen del input) que ocurren en plena caida
     /// </summary>
-    private void FallingManagement()
+    protected void FallingManagement()
     {
         // Determina la posicion objetivo
         var underPos = Position - Vector3.up;
@@ -266,7 +283,7 @@ public class CharacterLocomotion : MonoBehaviour
     /// <summary>
     /// Administra las acciones de agarrar un bloque
     /// </summary>
-    private void GrippingManagement()
+    protected void GrippingManagement()
     {
         // Determina la posicion objetivo
         var frontPos = Position + Direction;
@@ -275,7 +292,7 @@ public class CharacterLocomotion : MonoBehaviour
         var grippedBlock = Level.Grid.ExistsStillAt(frontPos) ? Level.Grid[frontPos] : null;
 
         // Si no estaba agarrando un bloque (estaba parado)
-        if (_state != State.Gripping)
+        if (_actionState != ActionState.Gripping)
         {
             // Hay bloque => Agarra
             if (grippedBlock != null)
@@ -340,7 +357,7 @@ public class CharacterLocomotion : MonoBehaviour
     /// <summary>
     /// Administra las acciones estando colgado
     /// </summary>
-    private void HangingManagement()
+    protected void HangingManagement()
     {
         // Boton de agarre
         if (_input.BtnA)
@@ -458,7 +475,7 @@ public class CharacterLocomotion : MonoBehaviour
     /// <summary>
     /// Administra las acciones de desplazamiento, horizontal y/o vertical
     /// </summary>
-    private void LocomotionManagement()
+    protected void LocomotionManagement()
     {
         // Si no esta orientado, gira
         if (Direction != _input.Direction)
@@ -525,10 +542,10 @@ public class CharacterLocomotion : MonoBehaviour
     /// <param name="speedFactor">Velocidad a la que realiza la accion. Siendo '1' la velocidad normal.</param>
     /// <param name="afterAction">Delegado de intrucciones a realizar finalizada la tarea</param>
     /// <returns></returns>
-    private IEnumerator DoFixedAction(ActionData action, State newState, State endState, float speedFactor, Action afterAction = null)
+    protected IEnumerator DoFixedAction(ActionData action, ActionState newState, ActionState endState, float speedFactor, Action afterAction = null)
     {
         // Cambio al nuevo estado y establece el root motion
-        _state = newState;
+        _actionState = newState;
         _mecanim.ApplyRootMotion(action.RootMotion);
 
         // Almacena valores iniciales
@@ -615,7 +632,7 @@ public class CharacterLocomotion : MonoBehaviour
             afterAction();
 
         // Cambia al estado en que queda luego de la accion y desactiva el rootMotion
-        _state = endState;
+        _actionState = endState;
         _mecanim.ApplyRootMotion(false);
     }
 
@@ -628,10 +645,10 @@ public class CharacterLocomotion : MonoBehaviour
     /// <param name="speedFactor">Velocidad a la que realiza la accion. Siendo '1' la velocidad normal.</param>
     /// <param name="afterAction">Delegado de intrucciones a realizar finalizada la tarea</param>
     /// <returns></returns>
-    private IEnumerator DoAction(ActionData action, State newState, State endState, float speedFactor, Action afterAction = null)
+    protected IEnumerator DoAction(ActionData action, ActionState newState, ActionState endState, float speedFactor, Action afterAction = null)
     {
         // Cambio al nuevo estado y establece el root motion
-        _state = newState;
+        _actionState = newState;
         _mecanim.ApplyRootMotion(action.RootMotion);
 
         // Almacena valores iniciales
@@ -718,53 +735,53 @@ public class CharacterLocomotion : MonoBehaviour
             afterAction();
 
         // Cambia al estado en que queda luego de la accion y desactiva el rootMotion
-        _state = endState;
+        _actionState = endState;
         _mecanim.ApplyRootMotion(false);
     }
 
     #region Acciones
 
-    private void Stand()
+    protected void Stand()
     {
         // Nuevo estado
-        _state = State.Standing;
+        _actionState = ActionState.Standing;
 
         // Confugiracion de mecanim
         _mecanim.SetFlag("Standing");
         _mecanim.SetSpeed(_generalSpeed);
     }
 
-    private void Hang()
+    protected void Hang()
     {
         // Nuevo estado
-        _state = State.Hanging;
+        _actionState = ActionState.Hanging;
 
         // Confugiracion de mecanim
         _mecanim.SetFlag("Hanging");
         _mecanim.SetSpeed(_generalSpeed);
     }
 
-    private void Grip()
+    protected void Grip()
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("Gripping");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(new ActionData("Gripping", .15f), State.Moving, State.Gripping, _generalSpeed));
+        StartCoroutine(DoAction(new ActionData("Gripping", .15f), ActionState.Moving, ActionState.Gripping, _generalSpeed));
     }
 
-    private void ReleaseGrip()
+    protected void ReleaseGrip()
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("Standing");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(new ActionData("ReleaseGripping", .15f), State.Moving, State.Standing, _generalSpeed));
+        StartCoroutine(DoAction(new ActionData("ReleaseGripping", .15f), ActionState.Moving, ActionState.Standing, _generalSpeed));
     }
 
-    private void Turn(Vector3 forward)
+    protected void Turn(Vector3 forward)
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("Standing");
@@ -781,10 +798,10 @@ public class CharacterLocomotion : MonoBehaviour
             actionData = _actionsHash["TurnRight"];
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(actionData, State.Moving, State.Standing, _generalSpeed));
+        StartCoroutine(DoAction(actionData, ActionState.Moving, ActionState.Standing, _generalSpeed));
     }
 
-    private void Run()
+    protected void Run()
     {
         // Confugiracion de mecanim
         _mecanim.SetSpeed(1f);
@@ -792,31 +809,34 @@ public class CharacterLocomotion : MonoBehaviour
         _mecanim.SetFloat("RunSpeed", _runSpeed / transform.localScale.x);
 
         // Inicia la rutina de la accion. Se le indica que una vez finalizada la tarea vuelva a la velocidad general
-        StartCoroutine(DoAction(_actionsHash["Run"], State.Moving, State.Standing, _runSpeed, delegate { _mecanim.SetSpeed(_generalSpeed); }));
+        StartCoroutine(DoAction(_actionsHash["Run"], ActionState.Moving, ActionState.Standing, _runSpeed, delegate { _mecanim.SetSpeed(_generalSpeed); }));
     }
 
-    private void Climb()
+    protected void Climb()
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("Climb");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_actionsHash["Climb"], State.Moving, State.Standing, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["Climb"], ActionState.Moving, ActionState.Standing, _generalSpeed));
     }
 
-    private void JumpDown()
+    protected void JumpDown()
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("JumpDown");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_actionsHash["JumpDown"], State.Moving, State.Standing, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["JumpDown"], ActionState.Moving, ActionState.Standing, _generalSpeed));
     }
 
-    private void Push(Block block)
+    protected void Push(Block block)
     {
+        // Guarda el estado del nivel
+        Level.SaveState();
+
         // Comunica al bloque la instruccion de "Push" y le devuelve el tiempo que demora la accion
         var duration = block.Pushed(Position);
 
@@ -827,14 +847,14 @@ public class CharacterLocomotion : MonoBehaviour
         StartCoroutine(_Push(1 / duration));
     }
 
-    private IEnumerator _Push(float actionSpeed)
+    protected IEnumerator _Push(float actionSpeed)
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("Push");
         _mecanim.SetSpeed(actionSpeed);
 
         // Realiza la accion
-        yield return StartCoroutine(DoAction(_actionsHash["Push"], State.Moving, State.Moving, actionSpeed));
+        yield return StartCoroutine(DoAction(_actionsHash["Push"], ActionState.Moving, ActionState.Moving, actionSpeed));
 
         // Confugiracion de mecanim
         _mecanim.SetFlag("Standing");
@@ -842,11 +862,14 @@ public class CharacterLocomotion : MonoBehaviour
 
         // Espera a que termine la transicion antes de setear el estado final
         yield return new WaitForSeconds(0.2f);
-        _state = State.Standing;
+        _actionState = ActionState.Standing;
     }
 
-    private void Pull(Block block)
+    protected void Pull(Block block)
     {
+        // Guarda el estado del nivel
+        Level.SaveState();
+
         // Comunica al bloque la instruccion de "Pull" y le devuelve el tiempo que demora la accion
         var duration = block.Pulled(Position);
 
@@ -859,11 +882,14 @@ public class CharacterLocomotion : MonoBehaviour
         _mecanim.SetSpeed(actionSpeed);
 
         // Inicia la rutina de la accion. Se le indica que una vez finalizada la tarea vuelva a la velocidad general
-        StartCoroutine(DoAction(_actionsHash["Pull"], State.Moving, State.Gripping, actionSpeed, delegate { _mecanim.SetSpeed(_generalSpeed); }));
+        StartCoroutine(DoAction(_actionsHash["Pull"], ActionState.Moving, ActionState.Gripping, actionSpeed, delegate { _mecanim.SetSpeed(_generalSpeed); }));
     }
 
-    private void PullToEdge(Block block)
+    protected void PullToEdge(Block block)
     {
+        // Guarda el estado del nivel
+        Level.SaveState();
+
         // Comunica al bloque la instruccion de "Pull" y le devuelve el tiempo que demora la accion
         var duration = block.Pulled(Position);
 
@@ -874,151 +900,151 @@ public class CharacterLocomotion : MonoBehaviour
         StartCoroutine(_PullToEdge(1 / duration));
     }
 
-    private IEnumerator _PullToEdge(float actionSpeed)
+    protected IEnumerator _PullToEdge(float actionSpeed)
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("PullToEdge");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Realiza la primera parte de la accion
-        yield return StartCoroutine(DoAction(_actionsHash["PullToEdge"], State.Moving, State.Moving, actionSpeed));
+        yield return StartCoroutine(DoAction(_actionsHash["PullToEdge"], ActionState.Moving, ActionState.Moving, actionSpeed));
 
         // Confugiracion de mecanim
         _mecanim.SetFlag("EdgeToHang");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Realiza la segunda parte de la accion
-        yield return StartCoroutine(DoAction(_actionsHash["EdgeToHang"], State.Moving, State.Hanging, _generalSpeed));
+        yield return StartCoroutine(DoAction(_actionsHash["EdgeToHang"], ActionState.Moving, ActionState.Hanging, _generalSpeed));
     }
 
-    private void HangUp()
+    protected void HangUp()
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("HangUp");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_actionsHash["HangUp"], State.Moving, State.Standing, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangUp"], ActionState.Moving, ActionState.Standing, _generalSpeed));
     }
 
-    private void HangDown()
+    protected void HangDown()
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("HangDown");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_actionsHash["HangDown"], State.Moving, State.Hanging, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangDown"], ActionState.Moving, ActionState.Hanging, _generalSpeed));
     }
 
-    private void HangLeft()
+    protected void HangLeft()
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("HangLeft");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_actionsHash["HangLeft"], State.Moving, State.Hanging, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangLeft"], ActionState.Moving, ActionState.Hanging, _generalSpeed));
     }
 
-    private void HangRight()
+    protected void HangRight()
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("HangRight");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_actionsHash["HangRight"], State.Moving, State.Hanging, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangRight"], ActionState.Moving, ActionState.Hanging, _generalSpeed));
     }
 
-    private void HangLeftConcave()
+    protected void HangLeftConcave()
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("HangLeftConcave");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_actionsHash["HangLeftConcave"], State.Moving, State.Hanging, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangLeftConcave"], ActionState.Moving, ActionState.Hanging, _generalSpeed));
     }
 
-    private void HangRightConcave()
+    protected void HangRightConcave()
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("HangRightConcave");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_actionsHash["HangRightConcave"], State.Moving, State.Hanging, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangRightConcave"], ActionState.Moving, ActionState.Hanging, _generalSpeed));
     }
 
-    private void HangLeftConvexe()
+    protected void HangLeftConvexe()
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("HangLeftConvexe");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_actionsHash["HangLeftConvexe"], State.Moving, State.Hanging, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangLeftConvexe"], ActionState.Moving, ActionState.Hanging, _generalSpeed));
     }
 
-    private void HangRightConvexe()
+    protected void HangRightConvexe()
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("HangRightConvexe");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_actionsHash["HangRightConvexe"], State.Moving, State.Hanging, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangRightConvexe"], ActionState.Moving, ActionState.Hanging, _generalSpeed));
     }
 
-    private void HangDrop()
+    protected void HangDrop()
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("HangDrop");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_actionsHash["HangDrop"], State.Moving, State.Standing, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangDrop"], ActionState.Moving, ActionState.Standing, _generalSpeed));
     }
 
-    private void HangToFall()
+    protected void HangToFall()
     {
         // Confugiracion de mecanim
         _mecanim.SetTrigger("Fall");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_actionsHash["HangToFall"], State.Moving, State.Falling, _fallingSpeed));
+        StartCoroutine(DoAction(_actionsHash["HangToFall"], ActionState.Moving, ActionState.Falling, _fallingSpeed));
     }
 
-    private void Fall()
+    protected void Fall()
     {
         // Confugiracion de mecanim
         _mecanim.SetTrigger("Fall", "Fall");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_actionsHash["Fall"], State.Moving, State.Falling, _fallingSpeed));
+        StartCoroutine(DoAction(_actionsHash["Fall"], ActionState.Moving, ActionState.Falling, _fallingSpeed));
     }
 
-    private void FallToHang()
+    protected void FallToHang()
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("Hanging");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_actionsHash["FallToHang"], State.Moving, State.Hanging, _fallingSpeed));
+        StartCoroutine(DoAction(_actionsHash["FallToHang"], ActionState.Moving, ActionState.Hanging, _fallingSpeed));
     }
 
-    private void Land()
+    protected void Land()
     {
         // Confugiracion de mecanim
         _mecanim.SetFlag("Land");
         _mecanim.SetSpeed(_generalSpeed);
 
         // Inicia la rutina de la accion
-        StartCoroutine(DoAction(_actionsHash["Land"], State.Moving, State.Standing, _generalSpeed));
+        StartCoroutine(DoAction(_actionsHash["Land"], ActionState.Moving, ActionState.Standing, _generalSpeed));
     }
 
     #endregion
@@ -1033,7 +1059,7 @@ public class CharacterLocomotion : MonoBehaviour
     /// <returns></returns>
     public bool IsInactive()
     {
-        return _state == State.Standing || _state == State.Hanging || _state == State.Gripping;
+        return _actionState == ActionState.Standing || _actionState == ActionState.Hanging || _actionState == ActionState.Gripping;
     }
 
     /// <summary>
@@ -1042,7 +1068,16 @@ public class CharacterLocomotion : MonoBehaviour
     /// <returns></returns>
     public bool IsFalling()
     {
-        return _state == State.Falling;
+        return _actionState == ActionState.Falling;
+    }
+
+    /// <summary>
+    /// Asigna una nueva posicion al character
+    /// </summary>
+    /// <param name="pos">Posicion deseada</param>
+    public void SetPosition(IntVector3 pos)
+    {
+        transform.position = new Vector3(pos.x + .5f, pos.y, pos.z + .5f);
     }
 
     /// <summary>
@@ -1055,9 +1090,44 @@ public class CharacterLocomotion : MonoBehaviour
         this._input = input;
     }
 
+    /// <summary>
+    /// Obtiene el estado interno del character
+    /// </summary>
+    /// <returns>Estado actual</returns>
+    public CharacterState GetState()
+    {
+        var state = new CharacterState(this.GetType());
+        state.ActionState = this._actionState;
+        state.Energy = this._energy;
+        state.FallingSpeed = this._fallingSpeed;
+        state.GeneralSpeed = this._generalSpeed;
+        state.Life = this._life;
+        state.Position = this.transform.position;
+        state.Rotation = this.transform.rotation;
+        state.RunSpeed = this._runSpeed;
+
+        return state;
+    }
+
+    /// <summary>
+    /// Asigna un nuevo estado al character
+    /// </summary>
+    /// <param name="state">Estado deseado</param>
+    public void SetState(CharacterState state)
+    {
+        this._actionState = state.ActionState;
+        this._energy = state.Energy;
+        this._fallingSpeed = state.FallingSpeed;
+        this._generalSpeed = state.GeneralSpeed;
+        this._life = state.Life;
+        this.transform.position = state.Position;
+        this.transform.rotation = state.Rotation;
+        this._runSpeed = state.RunSpeed;
+    }
+
     #endregion
 
-    enum State
+    public enum ActionState
     {
         Standing,
         Gripping,

@@ -25,7 +25,7 @@ public class CharacterMecanimController : MonoBehaviour
     private Dictionary<string, MecanimFlag> _flagsHash;
 
     private Animator _animator;
-    private CharacterLocomotion _charLocomotion;
+    private Character _charLocomotion;
 
 	#endregion
 
@@ -60,7 +60,7 @@ public class CharacterMecanimController : MonoBehaviour
 
         if (_charLocomotion == null)
         {
-            _charLocomotion = GetComponent<CharacterLocomotion>();
+            _charLocomotion = GetComponent<Character>();
         }
 
         _flagsList = new List<MecanimFlag>();

@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(CharacterLocomotion))]
+[RequireComponent(typeof(Character))]
 public class CustomCharacterController : MonoBehaviour
 {
     #region Variables (private)
 
-    private CharacterLocomotion _charLocomotion;
+    private Character _charLocomotion;
 
     #endregion
 
@@ -22,7 +22,7 @@ public class CustomCharacterController : MonoBehaviour
     void Start()
     {
         // Extrae el componente encargado de mover el pj
-        _charLocomotion = GetComponent<CharacterLocomotion>();
+        _charLocomotion = GetComponent<Character>();
     }
 
     /// <summary>
@@ -31,10 +31,16 @@ public class CustomCharacterController : MonoBehaviour
     void Update()
     {
         // Registra el input
-        var input = new CharacterInput(GetInput(), Input.GetAxis("A") != 0, false);
+        var input = new CharacterInput(GetInput(), Input.GetAxis("A") != 0, Input.GetAxis("B") != 0);
 
-        // Envia el input
+        // Envia el input de character
         _charLocomotion.SetInput(input);
+
+        // Reconoce si se presiono el boton de Rewind
+        if (Input.GetButtonDown("Rewind"))
+        {
+            Level.LoadPreviousState();
+        }
     }
 
     #endregion
