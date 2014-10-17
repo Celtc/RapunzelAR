@@ -6,7 +6,7 @@
 // Dynamic font support contributed by the NGUI community members:
 // Unisip, zh4ox, Mudwiz, Nicki, DarkMagicCK.
 
-#if !UNITY_3_5
+#if !UNITY_3_5 && !UNITY_FLASH
 #define DYNAMIC_FONT
 #endif
 
@@ -480,7 +480,7 @@ public class UIFont : MonoBehaviour
 	static public bool CheckIfRelated (UIFont a, UIFont b)
 	{
 		if (a == null || b == null) return false;
-#if DYNAMIC_FONT && !UNITY_FLASH
+#if DYNAMIC_FONT
 		if (a.isDynamic && b.isDynamic && a.dynamicFont.fontNames[0] == b.dynamicFont.fontNames[0]) return true;
 #endif
 		return a == b || a.References(b) || b.References(a);

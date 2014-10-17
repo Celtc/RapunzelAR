@@ -210,7 +210,7 @@ static public class NGUITools
 		cam = Camera.main;
 		if (cam && (cam.cullingMask & layerMask) != 0) return cam;
 
-#if UNITY_4_3 || UNITY_FLASH
+#if UNITY_4_3
 		Camera[] cameras = NGUITools.FindActive<Camera>();
 		for (int i = 0, imax = cameras.Length; i < imax; ++i)
 #else
@@ -914,6 +914,7 @@ static public class NGUITools
 		widget.width = 100;
 		widget.height = 100;
 		widget.depth = depth;
+		widget.gameObject.layer = go.layer;
 		return widget;
 	}
 

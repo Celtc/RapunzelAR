@@ -134,6 +134,8 @@ public class UIDragDropItem : MonoBehaviour
 	{
 		if (!mDragging)
 		{
+			mDragging = true;
+
 			if (cloneOnDrag)
 			{
 				GameObject clone = NGUITools.AddChild(transform.parent.gameObject, gameObject);
@@ -147,15 +149,10 @@ public class UIDragDropItem : MonoBehaviour
 				UICamera.currentTouch.dragged = clone;
 
 				UIDragDropItem item = clone.GetComponent<UIDragDropItem>();
-				item.mDragging = true;
 				item.Start();
 				item.OnDragDropStart();
 			}
-			else
-			{
-				mDragging = true;
-				OnDragDropStart();
-			}
+			else OnDragDropStart();
 		}
 	}
 

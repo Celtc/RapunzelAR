@@ -51,16 +51,10 @@ public class UITable : UIWidgetContainer
 	public Sorting sorting = Sorting.None;
 
 	/// <summary>
-	/// Final pivot point for the table itself.
+	/// Final pivot point for the grid's content.
 	/// </summary>
 
 	public UIWidget.Pivot pivot = UIWidget.Pivot.TopLeft;
-
-	/// <summary>
-	/// Final pivot point for the table's content.
-	/// </summary>
-
-	public UIWidget.Pivot cellAlignment = UIWidget.Pivot.TopLeft;
 
 	/// <summary>
 	/// Whether inactive children will be discarded from the table's calculations.
@@ -215,8 +209,6 @@ public class UITable : UIWidgetContainer
 		x = 0;
 		y = 0;
 
-		Vector2 po = NGUIMath.GetPivotOffset(cellAlignment);
-
 		for (int i = 0, imax = children.Count; i < imax; ++i)
 		{
 			Transform t = children[i];
@@ -226,20 +218,20 @@ public class UITable : UIWidgetContainer
 
 			Vector3 pos = t.localPosition;
 			pos.x = xOffset + b.extents.x - b.center.x;
-			pos.x -= Mathf.Lerp(0f, b.max.x - b.min.x - br.max.x + br.min.x, po.x) - padding.x;
+			pos.x += b.min.x - br.min.x + padding.x;
 
 			if (direction == Direction.Down)
 			{
 				pos.y = -yOffset - b.extents.y - b.center.y;
-				pos.y += Mathf.Lerp(b.max.y - b.min.y - bc.max.y + bc.min.y, 0f, po.y) - padding.y;
+				pos.y += (b.max.y - b.min.y - bc.max.y + bc.min.y) * 0.5f - padding.y;
 			}
 			else
 			{
-				pos.y = yOffset + b.extents.y - b.center.y;
-				pos.y -= Mathf.Lerp(0f, b.max.y - b.min.y - bc.max.y + bc.min.y, po.y) - padding.y;
+				pos.y = yOffset + (b.extents.y - b.center.y);
+				pos.y -= (b.max.y - b.min.y - bc.max.y + bc.min.y) * 0.5f - padding.y;
 			}
 
-			xOffset += br.size.x + padding.x * 2f;
+			xOffset += br.max.x - br.min.x + padding.x * 2f;
 
 			t.localPosition = pos;
 
@@ -256,7 +248,7 @@ public class UITable : UIWidgetContainer
 		// Apply the origin offset
 		if (pivot != UIWidget.Pivot.TopLeft)
 		{
-			po = NGUIMath.GetPivotOffset(pivot);
+			Vector2 po = NGUIMath.GetPivotOffset(pivot);
 
 			float fx, fy;
 

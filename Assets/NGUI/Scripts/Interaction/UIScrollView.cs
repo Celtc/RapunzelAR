@@ -349,9 +349,16 @@ public class UIScrollView : MonoBehaviour
 		}
 	}
 
-	void OnEnable ()
+	void OnEnable () { list.Add(this); }
+	void OnDisable () { list.Remove(this); }
+
+	/// <summary>
+	/// Set the initial drag value and register the listener delegates.
+	/// </summary>
+
+	protected virtual void Start ()
 	{
-		list.Add(this);
+		//UpdatePosition();
 
 		if (Application.isPlaying)
 		{
@@ -368,8 +375,6 @@ public class UIScrollView : MonoBehaviour
 			}
 		}
 	}
-
-	void OnDisable () { list.Remove(this); }
 
 	/// <summary>
 	/// Restrict the scroll view's contents to be within the scroll view's bounds.
@@ -756,7 +761,7 @@ public class UIScrollView : MonoBehaviour
 				if (restrictWithinPanel && mPanel.clipping != UIDrawCall.Clipping.None)
 					RestrictWithinBounds(dragEffect == DragEffect.None, canMoveHorizontally, canMoveVertically);
 
-				if (mDragStarted && onDragFinished != null) onDragFinished();
+				if (onDragFinished != null) onDragFinished();
 				if (!mShouldMove && onStoppedMoving != null)
 					onStoppedMoving();
 			}
@@ -948,12 +953,7 @@ public class UIScrollView : MonoBehaviour
 				{
 					if (NGUITools.GetActive(centerOnChild))
 					{
-						if (centerOnChild.nextPageThreshold != 0f)
-						{
-							mMomentum = Vector3.zero;
-							mScroll = 0f;
-						}
-						else centerOnChild.Recenter();
+						centerOnChild.Recenter();
 					}
 					else
 					{

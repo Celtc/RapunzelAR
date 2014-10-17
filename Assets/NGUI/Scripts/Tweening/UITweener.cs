@@ -450,16 +450,7 @@ public abstract class UITweener : MonoBehaviour
 			}
 		}
 
-		if (comp == null)
-		{
-			comp = go.AddComponent<T>();
-
-			if (comp == null)
-			{
-				Debug.LogError("Unable to add " + typeof(T) + " to " + NGUITools.GetHierarchy(go), go);
-				return null;
-			}
-		}
+		if (comp == null) comp = go.AddComponent<T>();
 #endif
 		comp.mStarted = false;
 		comp.duration = duration;
@@ -470,6 +461,12 @@ public abstract class UITweener : MonoBehaviour
 		comp.eventReceiver = null;
 		comp.callWhenFinished = null;
 		comp.enabled = true;
+
+		if (duration <= 0f)
+		{
+			comp.Sample(1f, true);
+			comp.enabled = false;
+		}
 		return comp;
 	}
 

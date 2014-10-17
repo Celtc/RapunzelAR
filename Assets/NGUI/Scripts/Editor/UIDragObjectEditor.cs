@@ -35,15 +35,14 @@ public class UIDragObjectEditor : Editor
 
 			if (sp.hasMultipleDifferentValues || (UIDragObject.DragEffect)sp.intValue != UIDragObject.DragEffect.None)
 			{
-				NGUIEditorTools.DrawProperty("  Momentum", serializedObject, "momentumAmount", GUILayout.Width(140f));
+				NGUIEditorTools.DrawProperty(" Momentum", serializedObject, "momentumAmount", GUILayout.Width(140f));
 			}
 
 			sp = NGUIEditorTools.DrawProperty("Keep Visible", serializedObject, "restrictWithinPanel");
 
 			if (sp.hasMultipleDifferentValues || sp.boolValue)
 			{
-				NGUIEditorTools.DrawProperty("  Content Rect", serializedObject, "contentRect");
-				NGUIEditorTools.DrawProperty("  Panel Region", serializedObject, "panelRegion");
+				NGUIEditorTools.DrawProperty(" Content Rect", serializedObject, "contentRect");
 			}
 		}
 		EditorGUI.EndDisabledGroup();

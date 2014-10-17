@@ -109,6 +109,10 @@ Prefab:
       propertyPath: m_LocalRotation.w
       value: .965925813
       objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: ee079deb27d78f949a1374af3b71c698, type: 2}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: ee079deb27d78f949a1374af3b71c698, type: 2}
   m_RootGameObject: {fileID: 399777897}
@@ -469,7 +473,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 976062259}
   m_Layer: 0
-  m_Name: MainMenu
+  m_Name: HUD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

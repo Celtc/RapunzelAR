@@ -71,8 +71,6 @@ public class UIPanelInspector : UIRectEditor
 
 	public void OnSceneGUI ()
 	{
-		if (Selection.objects.Length > 1) return;
-
 		UICamera cam = UICamera.FindCameraForLayer(mPanel.gameObject.layer);
 		if (cam == null || !cam.cachedCamera.isOrthoGraphic) return;
 
@@ -516,22 +514,6 @@ public class UIPanelInspector : UIRectEditor
 					EditorUtility.SetDirty(mPanel);
 				}
 			}
-			else if (mPanel.clipping == UIDrawCall.Clipping.TextureMask)
-			{
-				NGUIEditorTools.SetLabelWidth(0f);
-				GUILayout.Space(-90f);
-				Texture2D tex = (Texture2D)EditorGUILayout.ObjectField(mPanel.clipTexture,
-					typeof(Texture2D), false, GUILayout.Width(70f), GUILayout.Height(70f));
-				GUILayout.Space(20f);
-
-				if (mPanel.clipTexture != tex)
-				{
-					NGUIEditorTools.RegisterUndo("Clipping Change", mPanel);
-					mPanel.clipTexture = tex;
-					EditorUtility.SetDirty(mPanel);
-				}
-				NGUIEditorTools.SetLabelWidth(80f);
-			}
 		}
 
 		if (clipping != UIDrawCall.Clipping.None && !NGUIEditorTools.IsUniform(mPanel.transform.lossyScale))
@@ -621,10 +603,8 @@ public class UIPanelInspector : UIRectEditor
 			GUILayout.EndHorizontal();
 
 			GUILayout.BeginHorizontal();
-			EditorGUI.BeginDisabledGroup(mPanel.GetComponent<UIRoot>() != null);
-			bool off = EditorGUILayout.Toggle("Offset", mPanel.anchorOffset && mPanel.GetComponent<UIRoot>() == null, GUILayout.Width(100f));
+			bool off = EditorGUILayout.Toggle("Offset", mPanel.anchorOffset, GUILayout.Width(100f));
 			GUILayout.Label("Offset anchors by position", GUILayout.MinWidth(20f));
-			EditorGUI.EndDisabledGroup();
 			GUILayout.EndHorizontal();
 
 			if (mPanel.anchorOffset != off)
