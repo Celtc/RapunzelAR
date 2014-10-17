@@ -90,6 +90,8 @@ public class TypewriterEffect : MonoBehaviour
 		Finish();
 		mReset = true;
 		mActive = true;
+		mNextChar = 0f;
+		mCurrentOffset = 0;
 	}
 
 	/// <summary>
@@ -143,6 +145,9 @@ public class TypewriterEffect : MonoBehaviour
 			// Automatically skip all symbols
 			while (NGUIText.ParseSymbol(mFullText, ref mCurrentOffset)) { }
 			++mCurrentOffset;
+
+			// Reached the end? We're done.
+			if (mCurrentOffset >= mFullText.Length) break;
 
 			// Periods and end-of-line characters should pause for a longer time.
 			float delay = 1f / charsPerSecond;

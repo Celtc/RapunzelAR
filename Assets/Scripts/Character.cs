@@ -1072,6 +1072,16 @@ public class Character : MonoBehaviour
     }
 
     /// <summary>
+    /// Destruye el character e instancia el efecto sangriento
+    /// </summary>
+    public void Smash()
+    {
+        Debug.Log("Character: \"" + this.name + "\" siendo aplastado");
+        Instantiate(Resources.Load<GameObject>("Prefabs/Particles/BloodSplatter"), transform.position, Quaternion.identity);
+        Destroy(this.gameObject, .1f);
+    }
+
+    /// <summary>
     /// Asigna una nueva posicion al character
     /// </summary>
     /// <param name="pos">Posicion deseada</param>
@@ -1088,6 +1098,22 @@ public class Character : MonoBehaviour
     {
         //input.Direction = Vector3.right;
         this._input = input;
+    }
+
+    /// <summary>
+    /// Asigna un nuevo estado al character
+    /// </summary>
+    /// <param name="state">Estado deseado</param>
+    public void SetState(CharacterState state)
+    {
+        this._actionState = state.ActionState;
+        this._energy = state.Energy;
+        this._fallingSpeed = state.FallingSpeed;
+        this._generalSpeed = state.GeneralSpeed;
+        this._life = state.Life;
+        this.transform.position = state.Position;
+        this.transform.rotation = state.Rotation;
+        this._runSpeed = state.RunSpeed;
     }
 
     /// <summary>
@@ -1108,23 +1134,7 @@ public class Character : MonoBehaviour
 
         return state;
     }
-
-    /// <summary>
-    /// Asigna un nuevo estado al character
-    /// </summary>
-    /// <param name="state">Estado deseado</param>
-    public void SetState(CharacterState state)
-    {
-        this._actionState = state.ActionState;
-        this._energy = state.Energy;
-        this._fallingSpeed = state.FallingSpeed;
-        this._generalSpeed = state.GeneralSpeed;
-        this._life = state.Life;
-        this.transform.position = state.Position;
-        this.transform.rotation = state.Rotation;
-        this._runSpeed = state.RunSpeed;
-    }
-
+    
     #endregion
 
     public enum ActionState

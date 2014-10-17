@@ -1,7 +1,7 @@
 ----------------------------------------------
             NGUI: Next-Gen UI kit
  Copyright © 2011-2014 Tasharen Entertainment
-            Version 3.7.1
+            Version 3.7.4
     http://www.tasharen.com/?page_id=197
             support@tasharen.com
 ----------------------------------------------
@@ -54,6 +54,41 @@ and it will not be included in the build of your game. It's only used in the edi
 -----------------
  Version History
 -----------------
+
+3.7.4
+- FIX: UIInput no longer uses OnGUI unless you actually select the input field first (eliminates GC alloc).
+- FIX: UIEventTrigger's OnDragStart/OnDragEnd shouldn't have had parameters.
+- FIX: UIDragObject should now work properly with a constrained type UIRoot.
+- FIX: Key/controller interaction wasn't quite correct with sliders/scroll bars.
+- FIX: UIDragObject will now snap to pixels after the movement completes.
+
+3.7.3
+- NEW: New clipping option on panels: Texture Mask. Any texture with alpha will work (think round minimap etc).
+- NEW: UICamera now has an option for whether events go to colliders or rigidbodies.
+- NEW: Added Cell Alignment field to the UITable letting you change the content's alignment.
+- NEW: UIGrid now has a "cell snap" arrangement type for when you simply want to have widgets snap as you drag them.
+- NEW: 2D Sprites now have a "pixel size" property.
+- FIX: Pre-defined texture preview for the Prefab Tool wasn't quite working right.
+- FIX: UIPanel now always force-disables the "offset" option if it's on the UIRoot.
+- FIX: Handles will now automatically hide when multi-editing widgets, allowing you to use the transform move.
+
+3.7.2
+- NEW: You can now explicitly choose the panel used as a drag region for UIDragObject.
+- NEW: You can now specify a custom thumbnail texture for each item in the prefab toolbar.
+- NEW: TweenAlpha and TweenColor now work on Unity's SpriteRenderers.
+- NEW: Added UICamera.currentTouch.deltaTime (time since touch started).
+- FIX: UIGrid.Reposition should now work even without the component being started first.
+- FIX: Widgets with alpha 0 won't be selectable in the scene view anymore.
+- FIX: UIDragDropItem wasn't setting 'dragged' state properly if the item was cloned.
+- FIX: Alpha text encoding [Aa] style should no longer try to interpret non-hex characters.
+- FIX: Tweaks to how UICenterOnChild works and fixes to its paging functionality.
+- FIX: Minor fix to tween/play tween in regards to playing in reverse.
+- FIX: Bitmap labels now support thin spaces (U2009).
+- FIX: PropertyBinding now respects "editMode" flag properly.
+- FIX: Setting UILabel.material at run time on a dynamic font should now work as expected.
+- FIX: DX9 half pixel offset will now be ignored properly in /force OpenGL mode.
+- FIX: You should now be able to use the stylus on android devices.
+- DEL: UIInput.selectOnTab is now deprecated in favor of UIKeyNavigation (will auto-upgrade)
 
 3.7.1
 - NEW: Added generic delegates to UICamera you can subscribe to (onClick, onHover, etc) to replace the genericEventHandler.

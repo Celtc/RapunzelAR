@@ -192,11 +192,11 @@ static public class NGUIMenu
 	}
 
 	[MenuItem("NGUI/Create/2D UI", false, 6)]
-	//[MenuItem("Assets/NGUI/Create 2D UI", false, 1)]
+	[MenuItem("Assets/NGUI/Create 2D UI", false, 1)]
 	static void Create2D () { UICreateNewUIWizard.CreateNewUI(UICreateNewUIWizard.CameraType.Simple2D); }
 
 	[MenuItem("NGUI/Create/2D UI", true)]
-	//[MenuItem("Assets/NGUI/Create 2D UI", true, 1)]
+	[MenuItem("Assets/NGUI/Create 2D UI", true, 1)]
 	static bool Create2Da ()
 	{
 		if (UIRoot.list.Count == 0 || UICamera.list.size == 0) return true;
@@ -207,11 +207,11 @@ static public class NGUIMenu
 	}
 
 	[MenuItem("NGUI/Create/3D UI", false, 6)]
-	//[MenuItem("Assets/NGUI/Create 3D UI", false, 1)]
+	[MenuItem("Assets/NGUI/Create 3D UI", false, 1)]
 	static void Create3D () { UICreateNewUIWizard.CreateNewUI(UICreateNewUIWizard.CameraType.Advanced3D); }
 
 	[MenuItem("NGUI/Create/3D UI", true)]
-	//[MenuItem("Assets/NGUI/Create 3D UI", true, 1)]
+	[MenuItem("Assets/NGUI/Create 3D UI", true, 1)]
 	static bool Create3Da ()
 	{
 		if (UIRoot.list.Count == 0 || UICamera.list.size == 0) return true;
@@ -379,21 +379,21 @@ static public class NGUIMenu
 #region Open
 
 	[MenuItem("NGUI/Open/Atlas Maker", false, 9)]
-	//[MenuItem("Assets/NGUI/Open Atlas Maker", false, 0)]
+	[MenuItem("Assets/NGUI/Open Atlas Maker", false, 0)]
 	static public void OpenAtlasMaker ()
 	{
 		EditorWindow.GetWindow<UIAtlasMaker>(false, "Atlas Maker", true).Show();
 	}
 
 	[MenuItem("NGUI/Open/Font Maker", false, 9)]
-	//[MenuItem("Assets/NGUI/Open Bitmap Font Maker", false, 0)]
+	[MenuItem("Assets/NGUI/Open Bitmap Font Maker", false, 0)]
 	static public void OpenFontMaker ()
 	{
 		EditorWindow.GetWindow<UIFontMaker>(false, "Font Maker", true).Show();
 	}
 
 	[MenuItem("NGUI/Open/", false, 9)]
-	//[MenuItem("Assets/NGUI/", false, 0)]
+	[MenuItem("Assets/NGUI/", false, 0)]
 	static public void OpenSeparator2 () { }
 
 	[MenuItem("NGUI/Open/Prefab Toolbar", false, 9)]

@@ -214,6 +214,16 @@ public class Grid
     }
     
     /// <summary>
+    /// Devuelve el character que se encuentra en la posicion indicada
+    /// </summary>
+    /// <param name="pos">Posicion del character a buscar</param>
+    /// <returns>Character encontrado</returns>
+    public Character CharacterAt(IntVector3 pos)
+    {
+        return this._characters.Find(x => x.Position == pos);
+    }
+
+    /// <summary>
     /// Indica si existe un bloque en una posicion
     /// </summary>
     /// <param name="pos">Posicion a verificar</param>

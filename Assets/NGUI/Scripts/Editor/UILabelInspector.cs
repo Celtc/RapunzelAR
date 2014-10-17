@@ -3,7 +3,7 @@
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
 
-#if !UNITY_3_5 && !UNITY_FLASH
+#if !UNITY_FLASH
 #define DYNAMIC_FONT
 #endif
 
@@ -15,11 +15,7 @@ using UnityEditor;
 /// </summary>
 
 [CanEditMultipleObjects]
-#if UNITY_3_5
-[CustomEditor(typeof(UILabel))]
-#else
 [CustomEditor(typeof(UILabel), true)]
-#endif
 public class UILabelInspector : UIWidgetInspector
 {
 	public enum FontType
@@ -110,6 +106,12 @@ public class UILabelInspector : UIWidgetInspector
 		}
 
 		GUILayout.EndHorizontal();
+
+		if (mFontType == FontType.Unity)
+		{
+			EditorGUILayout.HelpBox("Dynamic fonts suffer from issues in Unity itself where your characters may disappear, get garbled, or just not show at times. Use this feature at your own risk.\n\n" +
+				"When you do run into such issues, please submit a Bug Report to Unity via Help -> Report a Bug (as this is will be a Unity bug, not an NGUI one).", MessageType.Warning);
+		}
 
 		EditorGUI.BeginDisabledGroup(!isValid);
 		{

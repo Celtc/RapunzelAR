@@ -171,7 +171,7 @@ public class Block : MonoBehaviour
         var from = transform.position;
         var to = transform.position + direction;
         Translate(from, to, moveTime);
-
+        
         // Devuelve el tiempo que demoro mover el bloque y sus encadenados
         return moveTime;
     }
@@ -227,11 +227,17 @@ public class Block : MonoBehaviour
     {
         if (!isMoving)
         {
+            // Realiza la traslacion
             var from = Position;
             var to = Position - Vector3.up;
             Translate(from, to, 1f / _fallingSpeed,
                 (to.y == 0) ? (Action)(() => { _isBasement = true; }) : null
             );
+
+            // Si hay un character abajo, lo aplasta
+            var character = Level.Grid.CharacterAt(Position - Vector3.up);
+            if (character != null)
+                character.Smash();
         }
     }
 

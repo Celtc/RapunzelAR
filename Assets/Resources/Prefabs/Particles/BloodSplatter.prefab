@@ -10,6 +10,7 @@ GameObject:
   - 4: {fileID: 400000}
   - 198: {fileID: 19800000}
   - 199: {fileID: 19900000}
+  - 114: {fileID: 11400000}
   m_Layer: 0
   m_Name: BloodSplatter
   m_TagString: Untagged
@@ -28,6 +29,19 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb85d768299564a4980b47ee37362bae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _lifeTime: .649999976
+  _playOnAwake: 1
 --- !u!198 &19800000
 ParticleSystem:
   m_ObjectHideFlags: 1
@@ -78,7 +92,7 @@ ParticleSystem:
         m_PostInfinity: 2
       minMaxState: 0
     startSpeed:
-      scalar: 6
+      scalar: 2
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -276,8 +290,8 @@ ParticleSystem:
   ShapeModule:
     serializedVersion: 2
     enabled: 1
-    type: 4
-    radius: .850000024
+    type: 2
+    radius: .180000007
     angle: 90
     length: 5
     boxX: 0
@@ -322,7 +336,7 @@ ParticleSystem:
         m_PreInfinity: 2
         m_PostInfinity: 2
       minMaxState: 0
-    cnt0: 80
+    cnt0: 140
     cnt1: 30
     cnt2: 30
     cnt3: 30
@@ -1102,7 +1116,7 @@ ParticleSystemRenderer:
   m_SortingOrder: 0
   m_SortingLayerID: 0
   m_RenderMode: 0
-  m_MaxParticleSize: .5
+  m_MaxParticleSize: .0399999991
   m_CameraVelocityScale: 0
   m_VelocityScale: 0
   m_LengthScale: 2

@@ -41,6 +41,12 @@ public class CustomCharacterController : MonoBehaviour
         {
             Level.LoadPreviousState();
         }
+
+        // Reconoce si se presiono el boton de Escape
+        if (Input.GetButtonDown("Escape"))
+        {
+            Application.Quit();
+        }
     }
 
     #endregion
