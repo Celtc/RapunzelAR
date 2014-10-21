@@ -30,7 +30,6 @@ public class Index : MonoBehaviour
         }
     }
 
-    //TODO: Revisar el uso de memoria, tal ves sea mejor utilizar un encapsulamiento al cual se acceda a los elementos especificando el indice
     public static List<TextAsset> Levels
     {
         get
@@ -123,8 +122,6 @@ public class Index : MonoBehaviour
 
         throw new MissingMemberException();
     }
-
-
-
+    
 	#endregion
 }

@@ -10,6 +10,7 @@ public class Level : MonoBehaviour
 
     private static GridOriginator _gridOriginator;
     private static GridCaretaker _gridCaretaker;
+    private static TextAsset _currentLevel;
     
 	#endregion
 
@@ -51,6 +52,15 @@ public class Level : MonoBehaviour
 	
 	}
 
+    /// <summary>
+    /// Llamado al cagar una escena.
+    /// </summary>
+    private void OnLevelWasLoaded(int level)
+    {
+        if (level == 1 && _currentLevel != null)
+            Level.LoadLevel(new LevelParser(_currentLevel));
+    }
+
 	#endregion
 
     #region Metodos privados
@@ -58,30 +68,30 @@ public class Level : MonoBehaviour
     #endregion
 
     #region Metodos publicos
-
+            
     /// <summary>
-    /// Carga un nivel, cargando los elementos del mismo y generando su grilla
+    /// Establece como el nivel candidato a cargar el textAsset deseado
     /// </summary>
-    /// <param name="levelName">Nombre del nivel a cargar</param>
-    public static void Load(string levelName)
+    /// <param name="levelName">Nombre del nivel (textAsset) a cargar</param>
+    public static void SetLevel(string levelName)
     {
         var level = Index.Levels.Find(x => x.name == levelName);
         if (level)
         {
             Debug.Log("Cargando el nivel \"" + levelName + "\"");
-            Load(new LevelParser(level));
+            _currentLevel = level;
         }
         else
         {
             Debug.Log("No se encontro el nivel \"" + levelName + "\"");
         }
     }
-
+    
     /// <summary>
-    /// Carga un nivel, cargando un memento del mismo
+    /// Carga un nivel, instanciando un memento del mismo
     /// </summary>
     /// <param name="gridMemento"></param>
-    public static void Load(GridMemento gridMemento)
+    public static void LoadLevel(GridMemento gridMemento)
     {
         // Instancia las clases de memento si no estaban instanciadas
         if (_gridOriginator == null) _gridOriginator = new GridOriginator();
@@ -120,7 +130,7 @@ public class Level : MonoBehaviour
         // Destruye la grilla
         _gridOriginator.Clear();
     }
-
+    
     /// <summary>
     /// Spawnea un bloque en el mundo
     /// </summary>

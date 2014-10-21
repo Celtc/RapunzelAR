@@ -71,7 +71,7 @@ public class GridOriginator
         Level.Unload();
 
         // Carga el memento
-        Level.Load(memento);
+        Level.LoadLevel(memento);
     }
 
 	#endregion

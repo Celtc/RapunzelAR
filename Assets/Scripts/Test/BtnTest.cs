@@ -42,7 +42,7 @@ public class BtnTest : MonoBehaviour
 
     void LoadLevel()
     {
-        Level.Load("test");
+        Level.SetLevel("test");
     }
     
 	#endregion

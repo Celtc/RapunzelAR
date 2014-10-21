@@ -25,6 +25,13 @@ public class IntVector3
 
     #region Metodos
 
+    public IntVector3(int x, int y)
+    {
+        _x = x;
+        _y = y;
+        _z = int.MinValue;
+    }
+
     public IntVector3(int x, int y, int z)
     {
         _x = x;

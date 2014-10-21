@@ -37,9 +37,23 @@ public class LevelParser
         return memento;
     }
 
+    /// <summary>
+    /// Parsea el header del XML
+    /// </summary>
+    /// <returns></returns>
+    public LevelInfo ToLevelInfo()
+    {
+        return new LevelInfo();
+    }
+
     public static implicit operator GridMemento(LevelParser p)
     {
         return p.ToGridMemento();
+    }
+
+    public static implicit operator LevelInfo(LevelParser p)
+    {
+        return p.ToLevelInfo();
     }
 
     #endregion
