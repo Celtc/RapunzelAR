@@ -6,6 +6,7 @@
 	<GoldScore>30000</GoldScore>
 	<SilverScore>25000</SilverScore>
 	<BronzeScore>20000</BronzeScore>
+	<Difficulty>3</Difficulty>
 	<Rewinds>10</Rewinds>
   </Data>
   <Grid>

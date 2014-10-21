@@ -6,16 +6,16 @@ using System.Collections.Generic;
 
 public class Level : MonoBehaviour
 {
-	#region Variables (private)
+    #region Variables (private)
 
     private static GridOriginator _gridOriginator;
     private static GridCaretaker _gridCaretaker;
     private static TextAsset _currentLevel;
     private static LevelInfo _currentLevelInfo;
-    
-	#endregion
 
-	#region Propiedades (public)
+    #endregion
+
+    #region Propiedades (public)
 
     public static Grid Grid
     {
@@ -30,9 +30,14 @@ public class Level : MonoBehaviour
         get { return _currentLevelInfo; }
     }
 
-	#endregion
+    public static int HashID
+    {
+        get { return _currentLevel.GetHashCode(); }
+    }
 
-	#region Funciones de evento de Unity
+    #endregion
+
+    #region Funciones de evento de Unity
 
     /// <summary>
     /// Llamado siempre al inicializar el componente.
@@ -42,21 +47,21 @@ public class Level : MonoBehaviour
 
     }
 
-	/// <summary>
+    /// <summary>
     /// Llamado al inicializar el componente, si MonoBehaviour esta habilitado.
-	/// </summary>
-	void Start ()	
-	{
+    /// </summary>
+    void Start()
+    {
 
-	}
+    }
 
-	/// <summary>
+    /// <summary>
     /// Update es llamado una vez por frame, si MonoBehaviour esta habilitado.
-	/// </summary>
-	void Update () 
-	{
-	
-	}
+    /// </summary>
+    void Update()
+    {
+
+    }
 
     /// <summary>
     /// Llamado al cagar una escena.
@@ -67,16 +72,16 @@ public class Level : MonoBehaviour
             Level.Load(new LevelXMLParser(_currentLevel));
     }
 
-	#endregion
+    #endregion
 
     #region Metodos privados
-    
+
     #endregion
 
     #region Metodos publicos
-    
+
     /// <summary>
-    /// Establece como el nivel candidato a cargar el textAsset deseado
+    /// Establece el nivel candidato a cargar
     /// </summary>
     /// <param name="levelName">Nombre del nivel (textAsset) a cargar</param>
     public static void Set(string levelName)
@@ -93,13 +98,34 @@ public class Level : MonoBehaviour
             Debug.Log("No se encontro el nivel \"" + levelName + "\"");
         }
     }
-    
+
+    /// <summary>
+    /// Establece el nivel candidato a cargar
+    /// </summary>
+    /// <param name="levelName">Nombre del nivel (textAsset) a cargar</param>
+    public static void Set(int levelIndex)
+    {
+        var level = Index.Levels[levelIndex];
+        if (level)
+        {
+            Debug.Log("Establecido el nivel \"" + level.name + "\"");
+            _currentLevelInfo = new LevelXMLParser(level);
+            _currentLevel = level;
+        }
+        else
+        {
+            Debug.Log("No se encontro el nivel \"" + level.name + "\"");
+        }
+    }
+
     /// <summary>
     /// Carga un nivel, instanciando un memento del mismo
     /// </summary>
     /// <param name="gridMemento"></param>
     public static void Load(GridMemento gridMemento)
     {
+        Debug.Log("Cargando el nivel \"" + _currentLevelInfo.LevelName + "\"");
+
         // Instancia las clases de memento si no estaban instanciadas
         if (_gridOriginator == null) _gridOriginator = new GridOriginator();
         if (_gridCaretaker == null) _gridCaretaker = new GridCaretaker(10);
@@ -123,7 +149,7 @@ public class Level : MonoBehaviour
     public static void Unload()
     {
         // Destruye todos los bloques
-        foreach(var block in _gridOriginator.Grid.AllBlocks)
+        foreach (var block in _gridOriginator.Grid.AllBlocks)
         {
             Destroy(block.gameObject);
         }
@@ -137,7 +163,7 @@ public class Level : MonoBehaviour
         // Destruye la grilla
         _gridOriginator.Clear();
     }
-    
+
     /// <summary>
     /// Spawnea un bloque en el mundo
     /// </summary>
@@ -166,7 +192,7 @@ public class Level : MonoBehaviour
 
         // Lo agrega al grid
         _gridOriginator.Grid.AddBlock(instancedBlock);
-    }    
+    }
 
     /// <summary>
     /// Spawnea un bloque con un determinado estado
@@ -214,7 +240,7 @@ public class Level : MonoBehaviour
         {
             Camera.main.GetComponent<SmoothFollowAdvance>().SetTarget(instancedCharacter.transform);
         }
-        
+
         // Lo agrega al grid
         _gridOriginator.Grid.AddCharacter(instancedCharacter.GetComponent<Character>());
     }
@@ -265,5 +291,5 @@ public class Level : MonoBehaviour
         sFader.FadeInOut();
     }
 
-	#endregion
+    #endregion
 }

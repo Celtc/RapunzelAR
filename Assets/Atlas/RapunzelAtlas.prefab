@@ -40,9 +40,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: b63db33e4b5bd4b43b344322f3731f29, type: 2}
   mSprites:
+  - name: BronzePrize
+    x: 1921
+    y: 1725
+    width: 105
+    height: 107
+    borderLeft: 0
+    borderRight: 0
+    borderTop: 0
+    borderBottom: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: GoldPrize
+    x: 1921
+    y: 1833
+    width: 105
+    height: 107
+    borderLeft: 0
+    borderRight: 0
+    borderTop: 0
+    borderBottom: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
   - name: Logo RapunzelAR1
     x: 0
-    y: 1063
+    y: 1556
     width: 1920
     height: 492
     borderLeft: 0
@@ -55,7 +81,7 @@ MonoBehaviour:
     paddingBottom: 0
   - name: Logo RapunzelAR2
     x: 0
-    y: 1556
+    y: 1063
     width: 1920
     height: 492
     borderLeft: 0
@@ -71,6 +97,19 @@ MonoBehaviour:
     y: 570
     width: 1920
     height: 492
+    borderLeft: 0
+    borderRight: 0
+    borderTop: 0
+    borderBottom: 0
+    paddingLeft: 0
+    paddingRight: 0
+    paddingTop: 0
+    paddingBottom: 0
+  - name: SilverPrize
+    x: 1921
+    y: 1941
+    width: 105
+    height: 107
     borderLeft: 0
     borderRight: 0
     borderTop: 0

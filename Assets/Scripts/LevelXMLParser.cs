@@ -167,6 +167,7 @@ public class LevelXMLParser
             var xml = XDocument.Parse(stringReader.ReadToEnd());
             levelInfo.Version = xml.Root.Element("Version").Value;
             levelInfo.LevelName = xml.Root.Element("Data").Element("Name").Value;
+            levelInfo.Difficulty = int.Parse(xml.Root.Element("Data").Element("Difficulty").Value);
             levelInfo.GoldScore = float.Parse(xml.Root.Element("Data").Element("GoldScore").Value);
             levelInfo.SilverScore = float.Parse(xml.Root.Element("Data").Element("SilverScore").Value);
             levelInfo.BronzeScore = float.Parse(xml.Root.Element("Data").Element("BronzeScore").Value);
