@@ -5,7 +5,10 @@ using System.Collections.Generic;
 public class BtnTest : MonoBehaviour 
 {
 	#region Variables (private)
-        
+
+    [SerializeField]
+    private TextAsset _XML;
+
 	#endregion
 
 	#region Properties (public)
@@ -19,15 +22,18 @@ public class BtnTest : MonoBehaviour
 	/// </summary>
 	void Start () 
 	{
-        LoadLevel();
+        var parser = new LevelXMLParser(_XML);
+        var levelInfo = parser.ToLevelInfo();
+        var levelMemento = parser.ToGridMemento();
+
+        Debug.Log("Leido :\"" + levelInfo.LevelName + "\"");
 	}
 
 	/// <summary>
 	/// Update is called once per frame
 	/// </summary>
 	void Update () 
-	{
-	
+	{	
 	}
 
     void OnMouseDown()
@@ -36,13 +42,6 @@ public class BtnTest : MonoBehaviour
 
     void OnMouseUp()
     {
-        //Debug.Log(LevelGrid.GetBlock(8, 0, 9));
-        //Debug.Log(LevelGrid.GetBlocks());
-    }
-
-    void LoadLevel()
-    {
-        Level.SetLevel("test");
     }
     
 	#endregion

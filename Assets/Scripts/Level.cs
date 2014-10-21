@@ -11,6 +11,7 @@ public class Level : MonoBehaviour
     private static GridOriginator _gridOriginator;
     private static GridCaretaker _gridCaretaker;
     private static TextAsset _currentLevel;
+    private static LevelInfo _currentLevelInfo;
     
 	#endregion
 
@@ -22,6 +23,11 @@ public class Level : MonoBehaviour
         {
             return _gridOriginator.Grid;
         }
+    }
+
+    public static LevelInfo Info
+    {
+        get { return _currentLevelInfo; }
     }
 
 	#endregion
@@ -58,7 +64,7 @@ public class Level : MonoBehaviour
     private void OnLevelWasLoaded(int level)
     {
         if (level == 1 && _currentLevel != null)
-            Level.LoadLevel(new LevelParser(_currentLevel));
+            Level.Load(new LevelXMLParser(_currentLevel));
     }
 
 	#endregion
@@ -68,17 +74,18 @@ public class Level : MonoBehaviour
     #endregion
 
     #region Metodos publicos
-            
+    
     /// <summary>
     /// Establece como el nivel candidato a cargar el textAsset deseado
     /// </summary>
     /// <param name="levelName">Nombre del nivel (textAsset) a cargar</param>
-    public static void SetLevel(string levelName)
+    public static void Set(string levelName)
     {
         var level = Index.Levels.Find(x => x.name == levelName);
         if (level)
         {
             Debug.Log("Cargando el nivel \"" + levelName + "\"");
+            _currentLevelInfo = new LevelXMLParser(level);
             _currentLevel = level;
         }
         else
@@ -91,7 +98,7 @@ public class Level : MonoBehaviour
     /// Carga un nivel, instanciando un memento del mismo
     /// </summary>
     /// <param name="gridMemento"></param>
-    public static void LoadLevel(GridMemento gridMemento)
+    public static void Load(GridMemento gridMemento)
     {
         // Instancia las clases de memento si no estaban instanciadas
         if (_gridOriginator == null) _gridOriginator = new GridOriginator();

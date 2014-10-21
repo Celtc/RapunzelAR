@@ -10,11 +10,17 @@ public class LevelInfo
     private float silverScore;
     private float bronzeScore;
     private int rewinds;
+    private string version;
 
 	#endregion
 
 	#region Propiedades (public)
-
+    
+    public string Version
+    {
+        get { return version; }
+        set { version = value; }
+    }
 
     public string LevelName
     {
@@ -45,6 +51,7 @@ public class LevelInfo
         get { return goldScore; }
         set { goldScore = value; }
     }
+
 	#endregion
 
 	#region Metodos

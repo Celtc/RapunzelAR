@@ -50,7 +50,7 @@ public class RapunzelAPP : MonoBehaviour
     /// </summary>
     public void LoadLevel()
     {
-        Level.SetLevel("test");
+        Level.Set("test");
         Application.LoadLevel(1);
     }
 
