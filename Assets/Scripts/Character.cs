@@ -28,6 +28,10 @@ public class Character : MonoBehaviour
     protected CharacterInput _input;
     protected CharacterMecanimController _mecanim;
 
+    public delegate void GripEventDelegate();
+    protected List<GripEventDelegate> _pushDelegates = new List<GripEventDelegate>();
+    protected List<GripEventDelegate> _pullDelegates = new List<GripEventDelegate>();
+
     #endregion
 
     #region Properties (public)
@@ -834,8 +838,9 @@ public class Character : MonoBehaviour
 
     protected void Push(Block block)
     {
-        // Guarda el estado del nivel
-        Level.SaveState();
+        // Dispara los delegados
+        foreach (var del in _pushDelegates)
+            del();
 
         // Comunica al bloque la instruccion de "Push" y le devuelve el tiempo que demora la accion
         var duration = block.Pushed(Position);
@@ -867,8 +872,9 @@ public class Character : MonoBehaviour
 
     protected void Pull(Block block)
     {
-        // Guarda el estado del nivel
-        Level.SaveState();
+        // Dispara los delegados
+        foreach (var del in _pullDelegates)
+            del();
 
         // Comunica al bloque la instruccion de "Pull" y le devuelve el tiempo que demora la accion
         var duration = block.Pulled(Position);
@@ -887,8 +893,9 @@ public class Character : MonoBehaviour
 
     protected void PullToEdge(Block block)
     {
-        // Guarda el estado del nivel
-        Level.SaveState();
+        // Dispara los delegados
+        foreach (var del in _pullDelegates)
+            del();
 
         // Comunica al bloque la instruccion de "Pull" y le devuelve el tiempo que demora la accion
         var duration = block.Pulled(Position);
@@ -1053,6 +1060,16 @@ public class Character : MonoBehaviour
 
     #region Metodos publicos
 
+    public void RegisterPushDel(GripEventDelegate del)
+    {
+        _pushDelegates.Add(del);
+    }
+
+    public void RegisterPullDel(GripEventDelegate del)
+    {
+        _pullDelegates.Add(del);
+    }
+
     /// <summary>
     /// Determina si el character esta inactivo y podra realizar acciones
     /// </summary>
@@ -1136,7 +1153,7 @@ public class Character : MonoBehaviour
     }
     
     #endregion
-
+    
     public enum ActionState
     {
         Standing,

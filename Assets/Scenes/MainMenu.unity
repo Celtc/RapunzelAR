@@ -3278,6 +3278,7 @@ Prefab:
     - {fileID: 11400000, guid: 3e6c59770b4bb8e4ab44fae75f42d393, type: 2}
     - {fileID: 11400002, guid: 3e6c59770b4bb8e4ab44fae75f42d393, type: 2}
     - {fileID: 11400004, guid: 3e6c59770b4bb8e4ab44fae75f42d393, type: 2}
+    - {fileID: 11400006, guid: 3e6c59770b4bb8e4ab44fae75f42d393, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 3e6c59770b4bb8e4ab44fae75f42d393, type: 2}
   m_RootGameObject: {fileID: 669636035}
   m_IsPrefabParent: 0
@@ -3702,7 +3703,7 @@ MonoBehaviour:
   pixelSnap: 0
   onClick:
   - mTarget: {fileID: 485570597}
-    mMethodName: LoadLevel
+    mMethodName: StartLevel
     mParameters: []
     oneShot: 0
 --- !u!114 &742097494

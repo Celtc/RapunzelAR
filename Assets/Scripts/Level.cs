@@ -235,9 +235,14 @@ public class Level : MonoBehaviour
         // Lo ubica
         instancedCharacter.SetPosition(pos);
 
-        // Si es un character jugable lo targetea con la camara
+        // Si es un character jugable
         if (instancedCharacter.tag == "Player")
         {
+            // Registra eventos para salvar un memento al mover bloques
+            instancedCharacter.RegisterPushDel(() => Level.SaveState());
+            instancedCharacter.RegisterPullDel(() => Level.SaveState());
+
+            // Lo targetea con la camara
             Camera.main.GetComponent<SmoothFollowAdvance>().SetTarget(instancedCharacter.transform);
         }
 
@@ -259,9 +264,14 @@ public class Level : MonoBehaviour
         // Asigna el estado
         instancedCharacter.SetState(characterState);
 
-        // Si es un character jugable lo targetea con la camara
+        // Si es un character jugable
         if (instancedCharacter.tag == "Player")
         {
+            // Registra eventos para salvar un memento al mover bloques
+            instancedCharacter.RegisterPushDel(() => Level.SaveState());
+            instancedCharacter.RegisterPullDel(() => Level.SaveState());
+
+            // Lo targetea con la camara
             Camera.main.GetComponent<SmoothFollowAdvance>().SetTarget(instancedCharacter.transform);
         }
 
