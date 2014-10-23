@@ -19,6 +19,8 @@ GameObject:
   - 114: {fileID: 11400000}
   - 114: {fileID: 11400010}
   - 114: {fileID: 11400012}
+  - 114: {fileID: 11400014}
+  - 114: {fileID: 11400016}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -61,7 +63,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4294966783
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_HDR: 0
@@ -150,7 +152,7 @@ MonoBehaviour:
   startDistance: 10
   globalDensity: 1
   heightScale: 100
-  height: 0
+  height: 3000
   globalFogColor: {r: .5, g: .5, b: .5, a: 1}
   fogShader: {fileID: 4800000, guid: 70d8568987ac0499f952b54c7c13e265, type: 3}
 --- !u!114 &11400006
@@ -230,6 +232,32 @@ MonoBehaviour:
   _fadeSpeed: .25
   _blackTexture: {fileID: 2800000, guid: 6bef2f1c90acd84409cd5276077b27c6, type: 3}
   _alphaValue: 0
+--- !u!114 &11400014
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1eefeb5f91940d94587d890deae81c9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _timerLabel: {fileID: 0}
+  _charStadistics: {fileID: 0}
+--- !u!114 &11400016
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 859ed46232037b0499598417091081e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _movesLabel: {fileID: 0}
+  _charStadistics: {fileID: 0}
 --- !u!124 &12400000
 Behaviour:
   m_ObjectHideFlags: 1

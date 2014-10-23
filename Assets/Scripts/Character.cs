@@ -1140,6 +1140,10 @@ public class Character : MonoBehaviour
     /// <param name="state">Estado deseado</param>
     public void SetState(CharacterState state)
     {
+        var stadistics = GetComponent<CharacterStadistics>();
+        if (stadistics != null)
+            stadistics.SetStadistics(state.Moves, state.Timer);
+
         this._actionState = state.ActionState;
         this._energy = state.Energy;
         this._fallingSpeed = state.FallingSpeed;
@@ -1157,6 +1161,14 @@ public class Character : MonoBehaviour
     public CharacterState GetState()
     {
         var state = new CharacterState(this.GetType());
+        
+        var stadistics = GetComponent<CharacterStadistics>();
+        if (stadistics != null)
+        {
+            state.Moves = stadistics.Moves;
+            state.Timer = stadistics.Timer;
+        }
+
         state.ActionState = this._actionState;
         state.Energy = this._energy;
         state.FallingSpeed = this._fallingSpeed;

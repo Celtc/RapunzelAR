@@ -62,5 +62,16 @@ public class CharacterStadistics : MonoBehaviour
 
     #region Metodos
 
+    /// <summary>
+    /// Establece el nuevo valor de las estadisticas del character
+    /// </summary>
+    /// <param name="moves">Movimientos realizados</param>
+    /// <param name="timer">Tiempo en escena</param>
+    public void SetStadistics(int moves, float timer)
+    {
+        this._moves = moves;
+        this._timer = timer;
+    }
+
     #endregion
 }

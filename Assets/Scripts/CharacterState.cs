@@ -6,15 +6,17 @@ public class CharacterState
 {
 	#region Variables (private)
 
-    private int _indexType;    
-    private Vector3 _position;
-    private Quaternion _rotation;
-    private Character.ActionState _actionState;
-    private float _life;
-    private float _energy;
-    private float _runSpeed;
-    private float _generalSpeed;
-    private float _fallingSpeed;
+    protected int _indexType;
+    protected Vector3 _position;
+    protected Quaternion _rotation;
+    protected Character.ActionState _actionState;
+    protected float _life;
+    protected float _energy;
+    protected float _runSpeed;
+    protected float _generalSpeed;
+    protected float _fallingSpeed;
+    protected int _moves;
+    protected float _timer;
 
 	#endregion
 
@@ -71,6 +73,18 @@ public class CharacterState
     {
         get { return _rotation; }
         set { _rotation = value; }
+    }
+
+    public int Moves
+    {
+        get { return _moves; }
+        set { _moves = value; }
+    }
+
+    public float Timer
+    {
+        get { return _timer; }
+        set { _timer = value; }
     }
 
 	#endregion

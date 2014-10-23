@@ -265,6 +265,8 @@ public class Level : MonoBehaviour
 
             // Lo targetea con la camara
             Camera.main.GetComponent<SmoothFollowAdvance>().SetTarget(instancedCharacter.transform);
+            Camera.main.GetComponent<UITimerDisplay>().SetTarget(instancedCharacter);
+            Camera.main.GetComponent<UIMovesDisplay>().SetTarget(instancedCharacter);
         }
 
         // Lo agrega al grid
@@ -294,6 +296,8 @@ public class Level : MonoBehaviour
 
             // Lo targetea con la camara
             Camera.main.GetComponent<SmoothFollowAdvance>().SetTarget(instancedCharacter.transform);
+            Camera.main.GetComponent<UITimerDisplay>().SetTarget(instancedCharacter);
+            Camera.main.GetComponent<UIMovesDisplay>().SetTarget(instancedCharacter);
         }
 
         // Lo agrega al grid

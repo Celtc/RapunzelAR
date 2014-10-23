@@ -25,6 +25,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 400002}
   - 65: {fileID: 6500000}
+  - 114: {fileID: 11400010}
   - 114: {fileID: 11400006}
   - 114: {fileID: 11400000}
   - 114: {fileID: 11400004}
@@ -266,6 +267,21 @@ MonoBehaviour:
   mAtlas: {fileID: 11400000, guid: 2f2473f73b9ca724f9080d6d76009ea2, type: 2}
   mSpriteName: Button
   mFillCenter: 1
+--- !u!114 &11400010
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d44bc69c2ca5f943b845318866dc1bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioClip: {fileID: 8300000, guid: 19c170a76a42a2c42b028aa1a27db6f9, type: 3}
+  trigger: 0
+  volume: 1
+  pitch: 1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

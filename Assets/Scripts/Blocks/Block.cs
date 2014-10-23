@@ -206,12 +206,12 @@ public class Block : MonoBehaviour
             if (fraction < 1f) yield return 0;
         }
 
+        // Actualiza la grilla
+        Level.Instance.Grid.Update(this);
+
         // Ejecuta la accion si la hay
         if (postAction != null)
             postAction();
-
-        // Actualiza la grilla
-        Level.Instance.Grid.Update(this);
 
         this._isMoving = false;
     }
@@ -223,11 +223,11 @@ public class Block : MonoBehaviour
     {
         if (!isMoving)
         {
-            // Realiza la traslacion
+            // Comienza la traslacion
             var from = transform.position;
             var to = from - Vector3.up;
             Translate(from, to, 1f / _fallingSpeed,
-                (to.y < -10f) ? (Action)(() => { Destroy(this.gameObject); }) : null
+                (to.y < -10f) ? (Action)(() => { this.Destroy(); }) : null
             );
 
             // Si hay un character abajo, lo aplasta
