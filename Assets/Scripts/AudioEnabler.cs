@@ -23,14 +23,6 @@ public class AudioEnabler : MonoBehaviour
 
 	#region Funciones de evento de Unity
 
-    /// <summary>
-    /// Llamado siempre al inicializar el componente.
-    /// </summary>
-    void Awake()
-    {
-
-    }
-
 	/// <summary>
     /// Llamado al inicializar el componente, si MonoBehaviour esta habilitado.
 	/// </summary>
@@ -44,14 +36,6 @@ public class AudioEnabler : MonoBehaviour
 
         if(_destroyAfterEnable)
             Destroy(this);
-	}
-
-	/// <summary>
-    /// Update es llamado una vez por frame, si MonoBehaviour esta habilitado.
-	/// </summary>
-	void Update () 
-	{
-
 	}
 
 	#endregion

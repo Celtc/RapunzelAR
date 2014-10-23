@@ -1111,8 +1111,8 @@ public class Character : MonoBehaviour
     public void Smash()
     {
         Debug.Log("Character: \"" + this.name + "\" siendo aplastado");
-        Instantiate(Resources.Load<GameObject>("Prefabs/Particles/BloodSplatter"), transform.position, Quaternion.identity);
-        Destroy(this.gameObject, .1f);
+        Instantiate(Resources.Load<GameObject>("Prefabs/Particles/OilSplatter"), transform.position, Quaternion.identity);
+        Destroy();
     }
 
     /// <summary>

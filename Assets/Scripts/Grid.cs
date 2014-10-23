@@ -26,7 +26,7 @@ public class Grid
     {
         get
         {
-            return _blocksGrid[x, y, z];//OutOfGrid(new IntVector3(x, y, z)) ? null : _blocksGrid[x, y, z];
+            return _blocksGrid[x, y, z];
         }
     }
 
@@ -34,7 +34,7 @@ public class Grid
     {
         get
         {
-            return _blocksGrid[pos.x, pos.y, pos.z];//OutOfGrid(pos) ? null : _blocksGrid[pos.x, pos.y, pos.z];
+            return _blocksGrid[pos.x, pos.y, pos.z];
         }
     }
 
@@ -89,8 +89,18 @@ public class Grid
     /// <param name="size"></param>
     public Grid(IntVector3 size)
     {
-        _blocksGrid = new ExpandableMatrix<Block>(size);
+        _blocksGrid = new ExpandableMatrix<Block>(size, 5);
         _blocksHash = new Dictionary<Block, IntVector3>(size.x * size.y * size.z);
+    }
+
+    /// <summary>
+    /// Devuelve la longitud en el espacio de una de las tres dimensiones.
+    /// </summary>
+    /// <param name="dimension">Dimension a obtener la longitud de valores que poseen una imagen</param>
+    /// <returns>La longitud devuelta en un vector2 cuyo X es la longitud de los negtivos e Y es la longitud de los positivos</returns>
+    public Vector2 GetLength(int dimension)
+    {
+        return _blocksGrid.GetLength(dimension);
     }
 
     /// <summary>

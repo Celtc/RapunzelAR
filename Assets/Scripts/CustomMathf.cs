@@ -10,9 +10,14 @@ public class CustomMathf
         return new Vector3(Mathf.Round(vector.x), Mathf.Round(vector.y), Mathf.Round(vector.z));
     }
 
+    public static IntVector3 RoundToIntVector(float x, float y, float z)
+    {
+        return new IntVector3(Mathf.RoundToInt(x), Mathf.RoundToInt(y), Mathf.RoundToInt(z));
+    }
+
     public static IntVector3 RoundToIntVector(Vector3 vector)
     {
-        return new IntVector3((int)Mathf.Round(vector.x), (int)Mathf.Round(vector.y), (int)Mathf.Round(vector.z));
+        return new IntVector3(Mathf.RoundToInt(vector.x), Mathf.RoundToInt(vector.y), Mathf.RoundToInt(vector.z));
     }
 
 	#endregion

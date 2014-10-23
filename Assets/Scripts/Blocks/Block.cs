@@ -19,16 +19,19 @@ public class Block : MonoBehaviour
     [SerializeField]
     protected bool _isBasement = false;
 
+    [SerializeField]
+    protected bool _isShaking = false;
+    [SerializeField]
+    protected bool _isFalling = false;
+    [SerializeField]
+    protected bool _isMoving = false;
     protected float _shakingTimer = 0f;
     protected bool _shakingRoutine = false;
-    protected bool _isShaking = false;
-    protected bool _isFalling = false;
-    protected bool _isMoving = false;
 
     #endregion
 
     #region Propiedades (public)
-    
+
     public IntVector3 Position
     {
         get
@@ -94,7 +97,7 @@ public class Block : MonoBehaviour
             Fall();
 
     }
-    
+
     #endregion
 
     #region Metodos privados
@@ -136,13 +139,13 @@ public class Block : MonoBehaviour
         }
 
         // Hay bloques debajo pero estan temblando
-        else if (SupportIsShaking(underBlocks))
+        else if (!SupportIsFirm(underBlocks))
         {
             _isShaking = true;
         }
 
         // Hay bloques firmes debajo
-        else 
+        else
         {
             // Reinicia al contador de shaking
             _shakingTimer = 0f;
@@ -169,9 +172,9 @@ public class Block : MonoBehaviour
 
         // Mueve el bloque
         var from = transform.position;
-        var to = transform.position + (Vector3) direction;
+        var to = transform.position + (Vector3)direction;
         Translate(from, to, moveTime);
-        
+
         // Devuelve el tiempo que demoro mover el bloque y sus encadenados
         return moveTime;
     }
@@ -191,7 +194,7 @@ public class Block : MonoBehaviour
         // Variables temporales
         var fraction = 0f;
         var elapsedTime = -Time.deltaTime;
-        
+
         // Mientras que el tiempo sea menor a la duracion
         while (elapsedTime < duration)
         {
@@ -215,7 +218,7 @@ public class Block : MonoBehaviour
 
         this._isMoving = false;
     }
-    
+
     /// <summary>
     /// Accion de caer 1 posicion
     /// </summary>
@@ -272,12 +275,12 @@ public class Block : MonoBehaviour
 
             yield return 0;
         }
-        
+
         transform.rotation = Quaternion.Euler(Vector3.zero);
 
         _shakingRoutine = false;
     }
-    
+
     /// <summary>
     /// Obtiene todos los bloques que sostienen este bloque
     /// </summary>
@@ -287,18 +290,18 @@ public class Block : MonoBehaviour
         var blocks = new List<Block>();
 
         var myPos = Position;
-        var underBlocksPos = new IntVector3[] { 
-            new IntVector3(myPos.x, myPos.y - 1, myPos.z-1),
-            new IntVector3(myPos.x-1, myPos.y - 1, myPos.z),
-            new IntVector3(myPos.x, myPos.y - 1, myPos.z),
-            new IntVector3(myPos.x+1, myPos.y - 1, myPos.z),
-            new IntVector3(myPos.x, myPos.y - 1, myPos.z+1),
+        var underBlocksPos = new IntVector3[] {
+            CustomMathf.RoundToIntVector(myPos.x, myPos.y - 1, myPos.z-1),
+            CustomMathf.RoundToIntVector(myPos.x-1, myPos.y - 1, myPos.z),
+            CustomMathf.RoundToIntVector(myPos.x, myPos.y - 1, myPos.z),
+            CustomMathf.RoundToIntVector(myPos.x+1, myPos.y - 1, myPos.z),
+            CustomMathf.RoundToIntVector(myPos.x, myPos.y - 1, myPos.z+1)
         };
 
         foreach (var pos in underBlocksPos)
         {
             var underBlock = Level.Instance.Grid[pos];
-            if (underBlock && !underBlock.isFalling)
+            if (underBlock != null && !underBlock.isFalling)
             {
                 blocks.Add(underBlock);
             }
@@ -312,11 +315,11 @@ public class Block : MonoBehaviour
     /// </summary>
     /// <param name="blocks">Lista de bloques soporte</param>
     /// <returns>Verdadero si este bloque esta temblando</returns>
-    protected bool SupportIsShaking(List<Block> blocks)
+    protected bool SupportIsFirm(List<Block> blocks)
     {
-        return !blocks.Exists(x => !x._isShaking);
+        return blocks.Exists(x => !x.isShaking);
     }
-    
+
     #endregion
 
     #region Metodos publicos
@@ -364,7 +367,7 @@ public class Block : MonoBehaviour
         var direction = fromPos - Position;
         return MoveBlock(direction, _moveTime);
     }
-    
+
     /// <summary>
     /// Obtiene el estado interno del bloque
     /// </summary>

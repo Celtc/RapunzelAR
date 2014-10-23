@@ -11,6 +11,7 @@ public class Level : MonoBehaviour
     // Singleton pattern para poder acceder globalmente a la unica instancia del Level
     private static Level _instance;
 
+    [SerializeField]
     private GridOriginator _gridOriginator;
     private GridCaretaker _gridCaretaker;
     private TextAsset _currentLevel;
@@ -30,6 +31,8 @@ public class Level : MonoBehaviour
     {
         get
         {
+            if (_gridOriginator == null) return null;
+
             return _gridOriginator.Grid;
         }
     }

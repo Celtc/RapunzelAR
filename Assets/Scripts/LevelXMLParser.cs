@@ -91,11 +91,17 @@ public class LevelXMLParser
                 using (var strReader = new StringReader(heightStruct))
                 {
                     // Itera por profundidad y ancho
-                    for (int z = 0; z < size.z; z++)
+                    for (int z = (int) (size.z - 1); z >= 0; z--)
                     {
+                        // Lee hasta la primera linea valida
                         var line = strReader.ReadLine();
+                        while(line.Length == 0) line = strReader.ReadLine();
+
                         for (int x = 0; x < size.x; x++)
                         {
+                            // Descarta espacios en blanco al principio de la linea
+                            line = line.Trim();
+
                             // Lee el caracter en la pos X (omite las comas)
                             List<string> entries = line.Split(',').ToList<string>();
                             var currEntry = entries[x];

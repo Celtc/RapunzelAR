@@ -4,19 +4,20 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-[System.Serializable]
-public class ExpandableMatrix<T> where T : class
+public class ExpandableMatrix<T>
 {
     #region Variables (private)
 
-    private T[,,] _positives;
-    private T[,,] _negativesX;
-    private T[,,] _negativesY;
-    private T[,,] _negativesZ;
-    private T[,,] _negativesXY;
-    private T[,,] _negativesXZ;
-    private T[,,] _negativesYZ;
-    private T[,,] _negativesXYZ;
+    private T[, ,] _positives;
+    private T[, ,] _negativesX;
+    private T[, ,] _negativesY;
+    private T[, ,] _negativesZ;
+    private T[, ,] _negativesXY;
+    private T[, ,] _negativesXZ;
+    private T[, ,] _negativesYZ;
+    private T[, ,] _negativesXYZ;
+
+    private int _growExtraSpaces;
 
     #endregion
 
@@ -46,7 +47,8 @@ public class ExpandableMatrix<T> where T : class
                     case Octant.PositiveX | Octant.NegativeY | Octant.NegativeZ: result = _negativesYZ[x, -1 - y, -1 - z]; break;
                     case Octant.NegativeX | Octant.NegativeY | Octant.NegativeZ: result = _negativesXYZ[-1 - x, -1 - y, -1 - z]; break;
                 }
-            }catch{};
+            }
+            catch { };
 
             return result;
         }
@@ -77,6 +79,7 @@ public class ExpandableMatrix<T> where T : class
 
     public ExpandableMatrix()
     {
+        this._growExtraSpaces = 1;
         this._positives = new T[0, 0, 0];
         this._negativesX = new T[0, 0, 0];
         this._negativesY = new T[0, 0, 0];
@@ -86,9 +89,11 @@ public class ExpandableMatrix<T> where T : class
         this._negativesYZ = new T[0, 0, 0];
         this._negativesXYZ = new T[0, 0, 0];
     }
-    
-    public ExpandableMatrix(IntVector3 size)
+
+    public ExpandableMatrix(IntVector3 size, int growExtraSpaces = 0)
     {
+        this._growExtraSpaces = growExtraSpaces;
+
         size = new IntVector3(
             Mathf.Max(0, size.x),
             Mathf.Max(0, size.y),
@@ -105,8 +110,10 @@ public class ExpandableMatrix<T> where T : class
         this._negativesXYZ = new T[0, 0, 0];
     }
 
-    public ExpandableMatrix(IntVector3 minPoint, IntVector3 maxPoint)
+    public ExpandableMatrix(IntVector3 minPoint, IntVector3 maxPoint, int growExtraSpaces = 0)
     {
+        this._growExtraSpaces = growExtraSpaces;
+
         minPoint = new IntVector3(
             Mathf.Min(0, minPoint.x),
             Mathf.Min(0, minPoint.y),
@@ -129,24 +136,57 @@ public class ExpandableMatrix<T> where T : class
         this._negativesXYZ = new T[-minPoint.x, -minPoint.y, -minPoint.z];
     }
 
+    /// <summary>
+    /// Funcion que devuelve la longitud en el espacio de una de las tres dimensiones.
+    /// </summary>
+    /// <param name="dimension">Dimension a obtener la longitud de valores que poseen una imagen</param>
+    /// <returns>La longitud devuelta en un vector2 cuyo X es la longitud de los negtivos e Y es la longitud de los positivos</returns>
+    public Vector2 GetLength(int dimension)
+    {
+        int negLength, posLength;
+        if (dimension == 0)
+        {
+            negLength = Mathf.Max(_negativesX.GetLength(0), _negativesXY.GetLength(0), _negativesXZ.GetLength(0), _negativesXYZ.GetLength(0));
+            posLength = Mathf.Max(_positives.GetLength(0), _negativesY.GetLength(0), _negativesZ.GetLength(0), _negativesYZ.GetLength(0));
+        }
+        else if (dimension == 1)
+        {
+            negLength = Mathf.Max(_negativesY.GetLength(1), _negativesXY.GetLength(1), _negativesYZ.GetLength(1), _negativesXYZ.GetLength(1));
+            posLength = Mathf.Max(_positives.GetLength(1), _negativesX.GetLength(1), _negativesZ.GetLength(1), _negativesXZ.GetLength(1));
+        }
+        else
+        {
+            negLength = Mathf.Max(_negativesZ.GetLength(2), _negativesXZ.GetLength(2), _negativesYZ.GetLength(2), _negativesXYZ.GetLength(2));
+            posLength = Mathf.Max(_positives.GetLength(2), _negativesY.GetLength(2), _negativesX.GetLength(2), _negativesXY.GetLength(2));
+        }
+
+        return new Vector3(negLength, posLength);
+    }
+
     #endregion
 
     #region Metodos (privados)
 
-    private void SetValue(ref T[,,] matrix, int x, int y, int z, T value)
+    private void SetValue(ref T[, ,] matrix, int x, int y, int z, T value)
     {
         if (OutOfMatrix(matrix, x, y, z))
-            ResizeToInclude(ref matrix, x, y, z);
+        {
+            //Debug.Log("Agrandando Grilla");
+            ResizeToInclude(ref matrix, x + _growExtraSpaces, y + _growExtraSpaces, z + _growExtraSpaces);
+        }
 
         matrix[x, y, z] = value;
     }
 
-    private void ResizeToInclude(ref T[,,] matrix, int x, int y, int z)
+    private void ResizeToInclude(ref T[, ,] matrix, int x, int y, int z)
     {
-        ResizeArray(ref matrix, x + 1, y + 1, z + 1);
+        var xLength = Mathf.Max(matrix.GetLength(0), x + 1);
+        var yLength = Mathf.Max(matrix.GetLength(1), y + 1);
+        var zLength = Mathf.Max(matrix.GetLength(2), z + 1);
+        ResizeArray(ref matrix, xLength, yLength, zLength);
     }
 
-    private void ResizeArray(ref T[,,] array, int xLength, int yLength, int zLength)
+    private void ResizeArray(ref T[, ,] array, int xLength, int yLength, int zLength)
     {
         var newArray = new T[xLength, yLength, zLength];
         int minX = Math.Min(xLength, array.GetLength(0));
@@ -161,7 +201,7 @@ public class ExpandableMatrix<T> where T : class
         array = newArray;
     }
 
-    private bool OutOfMatrix(T[,,] matrix, int x, int y, int z)
+    private bool OutOfMatrix(T[, ,] matrix, int x, int y, int z)
     {
         return (x + 1 > matrix.GetLength(0) || y + 1 > matrix.GetLength(1) || z + 1 > matrix.GetLength(2));
     }

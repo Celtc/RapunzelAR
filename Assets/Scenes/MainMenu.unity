@@ -2570,6 +2570,12 @@ MonoBehaviour:
   _levels:
   - {fileID: 4900000, guid: 27d19e82393389142a96fbcfdf20e508, type: 3}
   - {fileID: 4900000, guid: 07e830eec71090c46802188154a71b2e, type: 3}
+  - {fileID: 4900000, guid: 2248d0c1cf0d5754897ef24ab1001a46, type: 3}
+  - {fileID: 4900000, guid: 37044f29520d28d47a316ef046dc6084, type: 3}
+  - {fileID: 4900000, guid: 4c02a9ac94546394f96ba35268fe0342, type: 3}
+  - {fileID: 4900000, guid: 67c427d393d1cdb4bb4a852bbb819794, type: 3}
+  - {fileID: 4900000, guid: 3bd081f7ad6ed574b9d0c93c98752251, type: 3}
+  - {fileID: 4900000, guid: b4372443a732d5347b00bf40f8b87b24, type: 3}
   _blocks:
   - {fileID: 11400000, guid: 84554957cd75ec54db7f30bdd52fe052, type: 2}
   _characters:
@@ -3281,7 +3287,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _audioSource: {fileID: 669636038}
-  _delayStart: 23.7999992
+  _delayStart: 10.3999996
   _loop: 0
   _destroyAfterEnable: 1
 --- !u!82 &669636038
