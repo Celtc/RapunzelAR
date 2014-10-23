@@ -71,8 +71,8 @@ public class UILevelSelectButton : MonoBehaviour
         if (!enabled) return;
 
         // Establece el nuevo nivel seleccionado
-        Level.Set(_levelIndex);
-        var levelInfo = Level.Info;
+        Level.Instance.Set(_levelIndex);
+        var levelInfo = Level.Instance.Info;
 
         // Muestra el Nombre del nivel
         var UILevelName = _UILevelInfo.transform.FindChild("UILabel - LevelName").GetComponent<UILabel>();
@@ -83,7 +83,7 @@ public class UILevelSelectButton : MonoBehaviour
         UIDifficulty.text = levelInfo.Difficulty == 1 ? "[66FA33]Fácil[-]" : (levelInfo.Difficulty == 2 ? "[FFFF66]Media[-]" : "[FF6333]Difícil[-]");
 
         // Determina si existe una puntuacion almacenada para el nivel
-        var hashID = Level.HashID.ToString();
+        var hashID = Level.Instance.HashID.ToString();
         var UIScore = _UILevelInfo.transform.FindChild("UILabel - Score").GetComponent<UILabel>();
         var UIPrize = _UILevelInfo.transform.FindChild("Sprite - Prize").GetComponent<UISprite>();
         if (PlayerPrefs.HasKey(hashID))

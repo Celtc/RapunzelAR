@@ -8,16 +8,25 @@ public class Level : MonoBehaviour
 {
     #region Variables (private)
 
-    private static GridOriginator _gridOriginator;
-    private static GridCaretaker _gridCaretaker;
-    private static TextAsset _currentLevel;
-    private static LevelInfo _currentLevelInfo;
+    // Singleton pattern para poder acceder globalmente a la unica instancia del Level
+    private static Level _instance;
+
+    private GridOriginator _gridOriginator;
+    private GridCaretaker _gridCaretaker;
+    private TextAsset _currentLevel;
+    private LevelInfo _currentLevelInfo;
 
     #endregion
 
     #region Propiedades (public)
 
-    public static Grid Grid
+    // Es 10% más optimo acceder hacer public _instance y acceder directamente pero bueno...
+    public static Level Instance
+    {
+        get { return _instance; }
+    }
+    
+    public Grid Grid
     {
         get
         {
@@ -25,12 +34,12 @@ public class Level : MonoBehaviour
         }
     }
 
-    public static LevelInfo Info
+    public LevelInfo Info
     {
         get { return _currentLevelInfo; }
     }
 
-    public static int HashID
+    public int HashID
     {
         get { return _currentLevel.GetHashCode(); }
     }
@@ -44,7 +53,8 @@ public class Level : MonoBehaviour
     /// </summary>
     void Awake()
     {
-
+        if (Level._instance == null)
+            Level._instance = this;
     }
 
     /// <summary>
@@ -69,7 +79,7 @@ public class Level : MonoBehaviour
     private void OnLevelWasLoaded(int level)
     {
         if (level == 1 && _currentLevel != null)
-            Level.Load(new LevelXMLParser(_currentLevel));
+            Level.Instance.Load(new LevelXMLParser(_currentLevel));
     }
 
     #endregion
@@ -84,26 +94,16 @@ public class Level : MonoBehaviour
     /// Establece el nivel candidato a cargar
     /// </summary>
     /// <param name="levelName">Nombre del nivel (textAsset) a cargar</param>
-    public static void Set(string levelName)
+    public void Set(string levelName)
     {
-        var level = Index.Levels.Find(x => x.name == levelName);
-        if (level)
-        {
-            Debug.Log("Cargando el nivel \"" + levelName + "\"");
-            _currentLevelInfo = new LevelXMLParser(level);
-            _currentLevel = level;
-        }
-        else
-        {
-            Debug.Log("No se encontro el nivel \"" + levelName + "\"");
-        }
+        Set(Index.Levels.FindIndex(x => x.name == levelName));
     }
 
     /// <summary>
     /// Establece el nivel candidato a cargar
     /// </summary>
     /// <param name="levelName">Nombre del nivel (textAsset) a cargar</param>
-    public static void Set(int levelIndex)
+    public void Set(int levelIndex)
     {
         var level = Index.Levels[levelIndex];
         if (level)
@@ -122,31 +122,31 @@ public class Level : MonoBehaviour
     /// Carga un nivel, instanciando un memento del mismo
     /// </summary>
     /// <param name="gridMemento"></param>
-    public static void Load(GridMemento gridMemento)
+    public void Load(GridMemento gridMemento)
     {
-        Debug.Log("Cargando el nivel \"" + _currentLevelInfo.LevelName + "\"");
+        Debug.Log("Cargando memento del nivel \"" + _currentLevelInfo.LevelName + "\"");
 
         // Instancia las clases de memento si no estaban instanciadas
-        if (_gridOriginator == null) _gridOriginator = new GridOriginator();
+        if (_gridOriginator == null) _gridOriginator = new GridOriginator(_currentLevelInfo.Size);
         if (_gridCaretaker == null) _gridCaretaker = new GridCaretaker(10);
 
         // Spawnea los bloques
         foreach (var blockState in gridMemento.BlocksState)
         {
-            Level.SpawnBlock(blockState);
+            Level.Instance.SpawnBlock(blockState);
         }
 
         // Spawnea los characters
         foreach (var charState in gridMemento.CharactersState)
         {
-            Level.SpawnCharacter(charState, true);
+            Level.Instance.SpawnCharacter(charState, true);
         }
     }
 
     /// <summary>
-    /// Descarga el nivel, destruyendo todos los bloques y characters y limpiando la grilla
+    /// Descarga el nivel, destruyendo todos los bloques, characters y la grilla
     /// </summary>
-    public static void Unload()
+    public void Unload()
     {
         // Destruye todos los bloques
         foreach (var block in _gridOriginator.Grid.AllBlocks)
@@ -161,7 +161,28 @@ public class Level : MonoBehaviour
         }
 
         // Destruye la grilla
-        _gridOriginator.Clear();
+        _gridOriginator = null;
+        _gridCaretaker = null;
+    }
+
+    /// <summary>
+    /// Destruye todos los gameObjects y limpia la grilla
+    /// </summary>
+    public void Clear()
+    {
+        // Destruye todos los bloques
+        var blocksCollection = _gridOriginator.Grid.AllBlocks.ToArray();
+        foreach (var block in blocksCollection)
+        {
+            block.Destroy();
+        }
+
+        // Destruye todos los characters
+        var charCollection = _gridOriginator.Grid.AllCharacters.ToArray();
+        foreach (var character in charCollection)
+        {
+            character.Destroy();
+        }
     }
 
     /// <summary>
@@ -170,7 +191,7 @@ public class Level : MonoBehaviour
     /// <param name="pos">Posicion en donde hara spawn</param>
     /// <param name="blockID">ID del tipo de bloque a spawnear (Index)</param>
     /// <param name="basement">Flag que determina si el cubo es inamovible</param>
-    public static void SpawnBlockAt(int blockID, IntVector3 pos, bool basement = false)
+    public void SpawnBlockAt(int blockID, IntVector3 pos, bool basement = false)
     {
         SpawnBlockAt(Index.Blocks[blockID], pos, basement);
     }
@@ -181,7 +202,7 @@ public class Level : MonoBehaviour
     /// <param name="pos">Posicion en donde hara spawn</param>
     /// <param name="block">Bloque a spawnear, se creara una instancia del mismo</param>
     /// <param name="basement">Flag que determina si el cubo es inamovible</param>
-    public static void SpawnBlockAt(Block block, IntVector3 pos, bool basement = false)
+    public void SpawnBlockAt(Block block, IntVector3 pos, bool basement = false)
     {
         // Instancia el bloque
         var instancedBlock = ((GameObject)Instantiate(block.gameObject, Vector3.zero, Quaternion.identity)).GetComponent<Block>();
@@ -198,7 +219,7 @@ public class Level : MonoBehaviour
     /// Spawnea un bloque con un determinado estado
     /// </summary>
     /// <param name="blockState">Estado del bloque</param>
-    public static void SpawnBlock(BlockState blockState)
+    public void SpawnBlock(BlockState blockState)
     {
         // Instancia el bloque
         var instancedBlock = ((GameObject)Instantiate(Index.Blocks[blockState.IndexType].gameObject, Vector3.zero, Quaternion.identity)).GetComponent<Block>();
@@ -206,7 +227,7 @@ public class Level : MonoBehaviour
         // Asigna el estado
         instancedBlock.SetState(blockState);
 
-        // Lo agrea al grid
+        // Lo agrega al grid
         _gridOriginator.Grid.AddBlock(instancedBlock);
     }
 
@@ -216,7 +237,7 @@ public class Level : MonoBehaviour
     /// <param name="character">Character a spawner, se creara una instancia del mismo</param>
     /// <param name="pos">Posicion en donde hara spawn</param>
     /// <param name="player">Jugador que sera seguido por las camaras</param>
-    public static void SpawnCharacterAt(int characterID, IntVector3 pos, bool player = false)
+    public void SpawnCharacterAt(int characterID, IntVector3 pos, bool player = false)
     {
         SpawnCharacterAt(Index.Characters[characterID], pos, player);
     }
@@ -227,7 +248,7 @@ public class Level : MonoBehaviour
     /// <param name="character">Character a spawner, se creara una instancia del mismo</param>
     /// <param name="pos">Posicion en donde hara spawn</param>
     /// <param name="player">Jugador que sera seguido por las camaras</param>
-    public static void SpawnCharacterAt(Character character, IntVector3 pos, bool player = false)
+    public void SpawnCharacterAt(Character character, IntVector3 pos, bool player = false)
     {
         // Instancia el character
         var instancedCharacter = ((GameObject)Instantiate(character.gameObject, Vector3.zero, Quaternion.identity)).GetComponent<Character>();
@@ -239,8 +260,8 @@ public class Level : MonoBehaviour
         if (instancedCharacter.tag == "Player")
         {
             // Registra eventos para salvar un memento al mover bloques
-            instancedCharacter.RegisterPushDel(() => Level.SaveState());
-            instancedCharacter.RegisterPullDel(() => Level.SaveState());
+            instancedCharacter.RegisterPushDel(() => Level.Instance.SaveState());
+            instancedCharacter.RegisterPullDel(() => Level.Instance.SaveState());
 
             // Lo targetea con la camara
             Camera.main.GetComponent<SmoothFollowAdvance>().SetTarget(instancedCharacter.transform);
@@ -255,7 +276,7 @@ public class Level : MonoBehaviour
     /// </summary>
     /// <param name="characterState">Estado del character</param>
     /// <param name="player">Jugador que sera seguido por las camaras</param>
-    public static void SpawnCharacter(CharacterState characterState, bool player = false)
+    public void SpawnCharacter(CharacterState characterState, bool player = false)
     {
 
         // Instancia el character
@@ -268,8 +289,8 @@ public class Level : MonoBehaviour
         if (instancedCharacter.tag == "Player")
         {
             // Registra eventos para salvar un memento al mover bloques
-            instancedCharacter.RegisterPushDel(() => Level.SaveState());
-            instancedCharacter.RegisterPullDel(() => Level.SaveState());
+            instancedCharacter.RegisterPushDel(() => Level.Instance.SaveState());
+            instancedCharacter.RegisterPullDel(() => Level.Instance.SaveState());
 
             // Lo targetea con la camara
             Camera.main.GetComponent<SmoothFollowAdvance>().SetTarget(instancedCharacter.transform);
@@ -282,7 +303,7 @@ public class Level : MonoBehaviour
     /// <summary>
     /// Guarda el estado de la grilla
     /// </summary>
-    public static void SaveState()
+    public void SaveState()
     {
         _gridCaretaker.Push(_gridOriginator.CreateMemento());
     }
@@ -290,7 +311,7 @@ public class Level : MonoBehaviour
     /// <summary>
     /// Carga un estado previo
     /// </summary>
-    public static void LoadPreviousState()
+    public void LoadPreviousState()
     {
         //TODO: Esto deberia hacerse con NGUI
         var gridMemento = _gridCaretaker.Pop();

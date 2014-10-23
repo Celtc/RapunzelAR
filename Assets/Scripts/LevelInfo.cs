@@ -6,6 +6,7 @@ public class LevelInfo
 	#region Variables (private)
 
     private string levelName;
+    private IntVector3 size;
     private int difficulty;
     private float goldScore;
     private float silverScore;
@@ -27,6 +28,12 @@ public class LevelInfo
     {
         get { return levelName; }
         set { levelName = value; }
+    }
+
+    public IntVector3 Size
+    {
+        get { return size; }
+        set { size = value; }
     }
 
     public int Difficulty

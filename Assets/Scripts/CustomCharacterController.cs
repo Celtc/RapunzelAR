@@ -39,7 +39,7 @@ public class CustomCharacterController : MonoBehaviour
         // Reconoce si se presiono el boton de Rewind
         if (Input.GetButtonDown("Rewind"))
         {
-            Level.LoadPreviousState();
+            Level.Instance.LoadPreviousState();
         }
 
         // Reconoce si se presiono el boton de Escape

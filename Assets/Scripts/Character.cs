@@ -148,7 +148,7 @@ public class Character : MonoBehaviour
         // Si en estados donde se apoya sobre sus pies
         if (_actionState == ActionState.Standing || _actionState == ActionState.Gripping)
         {
-            if (!Level.Grid.ExistsAt(Position - Vector3.up))
+            if (!Level.Instance.Grid.ExistsAt(Position - Vector3.up))
             {
                 Debug.Log("Accion: Cayendo");
                 falling = true;
@@ -159,7 +159,7 @@ public class Character : MonoBehaviour
         // Si esta sostenido de un bloque
         else if (_actionState == ActionState.Hanging)
         {
-            if (!Level.Grid.ExistsAt(Position + Direction))
+            if (!Level.Instance.Grid.ExistsAt(Position + Direction))
             {
                 Debug.Log("Accion: Cayendo");
                 falling = true;
@@ -259,11 +259,11 @@ public class Character : MonoBehaviour
         var underPos = Position - Vector3.up;
         
         // Si no hay bloques debajo
-        if (!Level.Grid.ExistsStillAt(underPos))
+        if (!Level.Instance.Grid.ExistsStillAt(underPos))
         {
             // Hay un hueco enfrente donde se puede agarrar
-            if (!Level.Grid.ExistsStillAt(Position + Direction) &&
-                Level.Grid.ExistsStillAt(underPos + Direction))
+            if (!Level.Instance.Grid.ExistsStillAt(Position + Direction) &&
+                Level.Instance.Grid.ExistsStillAt(underPos + Direction))
             {
                 Debug.Log("Cayendo -> Agarrandose");
                 FallToHang();
@@ -293,7 +293,7 @@ public class Character : MonoBehaviour
         var frontPos = Position + Direction;
 
         // Obtiene el cubo objetivo
-        var grippedBlock = Level.Grid.ExistsStillAt(frontPos) ? Level.Grid[frontPos] : null;
+        var grippedBlock = Level.Instance.Grid.ExistsStillAt(frontPos) ? Level.Instance.Grid[frontPos] : null;
 
         // Si no estaba agarrando un bloque (estaba parado)
         if (_actionState != ActionState.Gripping)
@@ -322,10 +322,10 @@ public class Character : MonoBehaviour
 
                 // Tira del bloque, si no hay bloques atras
                 else if (_input.Direction == Direction * -1f &&
-                    !Level.Grid.ExistsAt(Position - Direction))
+                    !Level.Instance.Grid.ExistsAt(Position - Direction))
                 {
                     // Hay un bloque atras abajo donde pararse
-                    if (Level.Grid.ExistsStillAt(Position - Direction - Vector3.up))
+                    if (Level.Instance.Grid.ExistsStillAt(Position - Direction - Vector3.up))
                     {
                         // Tira
                         Debug.Log("Accion: Tirando");
@@ -367,7 +367,7 @@ public class Character : MonoBehaviour
         if (_input.BtnA)
         {
             // Hay bloque debajo
-            if (Level.Grid.ExistsStillAt(Position - Vector3.up))
+            if (Level.Instance.Grid.ExistsStillAt(Position - Vector3.up))
             {
                 Debug.Log("Accion: Descolgando");
                 HangDrop();
@@ -399,7 +399,7 @@ public class Character : MonoBehaviour
             if (newInput.y == 0 && newInput.x != 0)
             {
                 // Hay un cubo en el lugar destino? -> Dobla (Acute)
-                if (Level.Grid.ExistsStillAt(targetPos))
+                if (Level.Instance.Grid.ExistsStillAt(targetPos))
                 {
                     // Direccion de strafe
                     if (_input.Direction.x > 0)
@@ -415,7 +415,7 @@ public class Character : MonoBehaviour
                 }
 
                 // Hay un cubo delante del lugar destino?
-                else if (Level.Grid.ExistsStillAt(targetPos + Direction))
+                else if (Level.Instance.Grid.ExistsStillAt(targetPos + Direction))
                 {
                     // Direccion de strafe
                     if (_input.Direction.x > 0)
@@ -434,13 +434,13 @@ public class Character : MonoBehaviour
                 else
                 {
                     if (_input.Direction.x > 0 &&
-                        !Level.Grid.ExistsStillAt(targetPos + Direction + Vector3.up))
+                        !Level.Instance.Grid.ExistsStillAt(targetPos + Direction + Vector3.up))
                     {
                         Debug.Log("Accion: Colgando -> Giro Derecha Convexo");
                         HangRightConvexe();
                     }
                     else if (_input.Direction.x < 0 && 
-                        !Level.Grid.ExistsStillAt(targetPos + Direction + Vector3.up))
+                        !Level.Instance.Grid.ExistsStillAt(targetPos + Direction + Vector3.up))
                     {
                         Debug.Log("Accion: Colgando -> Giro Izquierda Convexo");
                         HangLeftConvexe();
@@ -456,13 +456,13 @@ public class Character : MonoBehaviour
             else if (newInput.y != 0)
             {
                 // Input: arriba, y no hay bloque que lo impida -> sube
-                if (newInput.y == 1 && !Level.Grid.ExistsStillAt(targetPos + Direction))
+                if (newInput.y == 1 && !Level.Instance.Grid.ExistsStillAt(targetPos + Direction))
                 {
                     Debug.Log("Accion: Colgando -> Subir");
                     HangUp();
                 }
                 // Input: abajo, y hay un bloque debajo -> descuelga
-                else if (newInput.y == -1 && Level.Grid.ExistsStillAt(targetPos))
+                else if (newInput.y == -1 && Level.Instance.Grid.ExistsStillAt(targetPos))
                 {
                     Debug.Log("Accion: Descolgando");
                     HangDrop();
@@ -493,12 +493,12 @@ public class Character : MonoBehaviour
         var targetPos = Position + Direction;
 
         // Hay un cubo en el lugar destino?
-        if (Level.Grid.ExistsAt(targetPos))
+        if (Level.Instance.Grid.ExistsAt(targetPos))
         {
             // El cubo a trepar no esta quieto o hay un cubos que impidan trepar? (arriba nuestro o arriba del cubo a trepar)
-            if (Level.Grid.ExistsStillAt(targetPos) &&
-                !Level.Grid.ExistsStillAt(targetPos + Vector3.up) &&
-                !Level.Grid.ExistsStillAt(Position + Vector3.up))
+            if (Level.Instance.Grid.ExistsStillAt(targetPos) &&
+                !Level.Instance.Grid.ExistsStillAt(targetPos + Vector3.up) &&
+                !Level.Instance.Grid.ExistsStillAt(Position + Vector3.up))
             {
                 // Trepa
                 Debug.Log("Accion: Trepando");
@@ -514,7 +514,7 @@ public class Character : MonoBehaviour
         }
 
         // Hay un cubo en el piso del lugar destino?
-        else if (Level.Grid.ExistsStillAt(targetPos - Vector3.up))
+        else if (Level.Instance.Grid.ExistsStillAt(targetPos - Vector3.up))
         {
             // Avanza
             Debug.Log("Accion: Avanzando");
@@ -522,7 +522,7 @@ public class Character : MonoBehaviour
         }
 
         // Hay un cubo 2 niveles mas abajo?
-        else if (Level.Grid.ExistsStillAt(targetPos - Vector3.up * 2f))
+        else if (Level.Instance.Grid.ExistsStillAt(targetPos - Vector3.up * 2f))
         {
             // Salta abajo
             Debug.Log("Accion: Saltando abajo");
@@ -1060,11 +1060,28 @@ public class Character : MonoBehaviour
 
     #region Metodos publicos
 
+    /// <summary>
+    /// Destruye el character y lo elimina de la grilla
+    /// </summary>
+    public void Destroy()
+    {
+        Level.Instance.Grid.RemoveCharacter(this);
+        Destroy(this.gameObject);
+    }
+
+    /// <summary>
+    /// Registra un nuevo delegado para el evento de empujar un bloque
+    /// </summary>
+    /// <param name="del">Delegado a ejecutar</param>
     public void RegisterPushDel(GripEventDelegate del)
     {
         _pushDelegates.Add(del);
     }
 
+    /// <summary>
+    /// Registra un nuevo delegado para el evento de tirar de un bloque
+    /// </summary>
+    /// <param name="del">Delegado a ejecutar</param>
     public void RegisterPullDel(GripEventDelegate del)
     {
         _pullDelegates.Add(del);

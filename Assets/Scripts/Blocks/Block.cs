@@ -94,7 +94,7 @@ public class Block : MonoBehaviour
             Fall();
 
     }
-
+    
     #endregion
 
     #region Metodos privados
@@ -160,7 +160,7 @@ public class Block : MonoBehaviour
 
         // Determina si hay otro cubo implicado en el movimiento
         // El tiempo en moverlos sera el mayor de todos (una cadena es tan fuerte como el mas debil de sus eslabones)
-        var chainCube = Level.Grid[Position + direction];
+        var chainCube = Level.Instance.Grid[Position + direction];
         if (chainCube != null)
             moveTime = chainCube.MoveBlock(direction, moveTime);
 
@@ -169,14 +169,14 @@ public class Block : MonoBehaviour
 
         // Mueve el bloque
         var from = transform.position;
-        var to = transform.position + direction;
+        var to = transform.position + (Vector3) direction;
         Translate(from, to, moveTime);
         
         // Devuelve el tiempo que demoro mover el bloque y sus encadenados
         return moveTime;
     }
-        
-    protected void Translate(IntVector3 from, IntVector3 to, float duration, Action postAction = null)
+
+    protected void Translate(Vector3 from, Vector3 to, float duration, Action postAction = null)
     {
         StartCoroutine(TranslateRoutine(from, to, duration, postAction));
     }
@@ -184,17 +184,13 @@ public class Block : MonoBehaviour
     /// <summary>
     /// Rutina interna invocada por Translate()
     /// </summary>
-    protected IEnumerator TranslateRoutine(IntVector3 from, IntVector3 to, float duration, Action postAction)
+    protected IEnumerator TranslateRoutine(Vector3 from, Vector3 to, float duration, Action postAction)
     {
         this._isMoving = true;
 
         // Variables temporales
         var fraction = 0f;
         var elapsedTime = -Time.deltaTime;
-
-        // Pasaje posiciones enteras a exactas para manejo de la animacion
-        var fFrom = new Vector3(from.x + .5f, from.y + .5f, from.z + .5f);
-        var fTo = new Vector3(to.x + .5f, to.y + .5f, to.z + .5f);
         
         // Mientras que el tiempo sea menor a la duracion
         while (elapsedTime < duration)
@@ -204,7 +200,7 @@ public class Block : MonoBehaviour
 
             // Realiza el lerp
             fraction = Mathf.Clamp01(elapsedTime / duration);
-            transform.position = Vector3.Lerp(fFrom, fTo, fraction);
+            transform.position = Vector3.Lerp(from, to, fraction);
 
             // Espera al siguiente frame (solo si no termino de moverse)
             if (fraction < 1f) yield return 0;
@@ -215,7 +211,7 @@ public class Block : MonoBehaviour
             postAction();
 
         // Actualiza la grilla
-        Level.Grid.Update(this);
+        Level.Instance.Grid.Update(this);
 
         this._isMoving = false;
     }
@@ -228,14 +224,14 @@ public class Block : MonoBehaviour
         if (!isMoving)
         {
             // Realiza la traslacion
-            var from = Position;
-            var to = Position - Vector3.up;
+            var from = transform.position;
+            var to = from - Vector3.up;
             Translate(from, to, 1f / _fallingSpeed,
-                (to.y == 0) ? (Action)(() => { _isBasement = true; }) : null
+                (to.y < -10f) ? (Action)(() => { Destroy(this.gameObject); }) : null
             );
 
             // Si hay un character abajo, lo aplasta
-            var character = Level.Grid.CharacterAt(Position - Vector3.up);
+            var character = Level.Instance.Grid.CharacterAt(Position - Vector3.up);
             if (character != null)
                 character.Smash();
         }
@@ -290,7 +286,7 @@ public class Block : MonoBehaviour
     {
         var blocks = new List<Block>();
 
-        var myPos = (IntVector3)transform.position;
+        var myPos = Position;
         var underBlocksPos = new IntVector3[] { 
             new IntVector3(myPos.x, myPos.y - 1, myPos.z-1),
             new IntVector3(myPos.x-1, myPos.y - 1, myPos.z),
@@ -301,7 +297,7 @@ public class Block : MonoBehaviour
 
         foreach (var pos in underBlocksPos)
         {
-            var underBlock = Level.Grid[pos];
+            var underBlock = Level.Instance.Grid[pos];
             if (underBlock && !underBlock.isFalling)
             {
                 blocks.Add(underBlock);
@@ -324,7 +320,16 @@ public class Block : MonoBehaviour
     #endregion
 
     #region Metodos publicos
-    
+
+    /// <summary>
+    /// Destruye el bloque y lo elimina de la grilla
+    /// </summary>
+    public void Destroy()
+    {
+        Level.Instance.Grid.RemoveBlock(this);
+        Destroy(this.gameObject);
+    }
+
     /// <summary>
     /// Establece una nueva posicion para el bloque. Cualquier flag de shake o falling son reseteados.
     /// </summary>

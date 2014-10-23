@@ -7,34 +7,26 @@ using System.Collections.ObjectModel;
 
 public class Grid
 {
-    #region Constantes
-
-    const int _GRIDSIZE_X = 20;
-    const int _GRIDSIZE_Y = 40;
-    const int _GRIDSIZE_Z = 20;
-
-    #endregion
-
 	#region Variables (private)
 
     // Grilla de bloques
-    private Block[, ,] _blocksGrid = new Block[_GRIDSIZE_X, _GRIDSIZE_Y, _GRIDSIZE_Z];
+    private ExpandableMatrix<Block> _blocksGrid;
 
     // Lista de characters presentes en la grilla
     private List<Character> _characters = new List<Character>();
 
     // Diccionario para facilitar el acceso utilizando indices (independientemente de la posicion de los bloques)
-    private Dictionary<Block, IntVector3> _blocksHash = new Dictionary<Block, IntVector3>(_GRIDSIZE_X * _GRIDSIZE_Y * _GRIDSIZE_Z);
+    private Dictionary<Block, IntVector3> _blocksHash;
 
 	#endregion
 
 	#region Propiedades (public)
-
+    
     public Block this[int x, int y, int z]
     {
         get
         {
-            return OutOfGrid(new IntVector3(x, y, z)) ? null : _blocksGrid[x, y, z];
+            return _blocksGrid[x, y, z];//OutOfGrid(new IntVector3(x, y, z)) ? null : _blocksGrid[x, y, z];
         }
     }
 
@@ -42,7 +34,7 @@ public class Grid
     {
         get
         {
-            return OutOfGrid(pos) ? null : _blocksGrid[pos.x, pos.y, pos.z];
+            return _blocksGrid[pos.x, pos.y, pos.z];//OutOfGrid(pos) ? null : _blocksGrid[pos.x, pos.y, pos.z];
         }
     }
 
@@ -90,6 +82,29 @@ public class Grid
     #endregion
 
     #region Metodos publicos
+    
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="size"></param>
+    public Grid(IntVector3 size)
+    {
+        _blocksGrid = new ExpandableMatrix<Block>(size);
+        _blocksHash = new Dictionary<Block, IntVector3>(size.x * size.y * size.z);
+    }
+
+    /// <summary>
+    /// Limpia la grilla tanto de bloques como de characters
+    /// </summary>
+    public void Clear()
+    {
+        foreach (var blockPos in _blocksHash.Values.ToArray())
+        {
+            _blocksGrid[blockPos.x, blockPos.y, blockPos.z] = null;
+        }
+        _blocksHash.Clear();
+        _characters.Clear();
+    }
 
     /// <summary>
     /// Agrega un character a la lista
@@ -254,17 +269,17 @@ public class Grid
     /// </summary>
     /// <param name="pos">Posicion a verificar</param>
     /// <returns></returns>
-    public bool OutOfGrid(IntVector3 pos)
-    {
-        var result = false;
+    //public bool OutOfGrid(IntVector3 pos)
+    //{
+    //    var result = false;
 
-        if (pos.x < 0 || pos.x >= _GRIDSIZE_X ||
-            pos.z < 0 || pos.z >= _GRIDSIZE_Y ||
-            pos.y < 0 || pos.y >= _GRIDSIZE_Z)
-            result = true;
+    //    if (pos.x < 0 || pos.x >= _GRIDSIZE_X ||
+    //        pos.z < 0 || pos.z >= _GRIDSIZE_Y ||
+    //        pos.y < 0 || pos.y >= _GRIDSIZE_Z)
+    //        result = true;
 
-        return result;
-    }
+    //    return result;
+    //}
 
     #endregion
 }

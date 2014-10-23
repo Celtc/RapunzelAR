@@ -78,9 +78,9 @@ public class LevelXMLParser
 
             // Extrae el tamaño de la grilla
             var size = new Vector3(
-                int.Parse(xml.Root.Element("Grid").Element("Size").Element("X").Value),
-                int.Parse(xml.Root.Element("Grid").Element("Size").Element("Y").Value),
-                int.Parse(xml.Root.Element("Grid").Element("Size").Element("Z").Value)
+                int.Parse(xml.Root.Element("Data").Element("Size").Element("X").Value),
+                int.Parse(xml.Root.Element("Data").Element("Size").Element("Y").Value),
+                int.Parse(xml.Root.Element("Data").Element("Size").Element("Z").Value)
             );
 
             // Itera por niveles
@@ -135,7 +135,7 @@ public class LevelXMLParser
 
                                     // Crea el nuevo state
                                     var newBlockState = Index.Blocks[blockID].GetState();
-                                    newBlockState.Position = new Vector3(x + .5f, y + .5f, z + .5f);
+                                    newBlockState.Position = new Vector3(x, y, z);
                                     newBlockState.IsBasement = baseFlag;
 
                                     // Agrea el state
@@ -172,6 +172,11 @@ public class LevelXMLParser
             levelInfo.SilverScore = float.Parse(xml.Root.Element("Data").Element("SilverScore").Value);
             levelInfo.BronzeScore = float.Parse(xml.Root.Element("Data").Element("BronzeScore").Value);
             levelInfo.Rewinds = int.Parse(xml.Root.Element("Data").Element("Rewinds").Value);
+            levelInfo.Size = new IntVector3(
+                int.Parse(xml.Root.Element("Data").Element("Size").Element("X").Value),
+                int.Parse(xml.Root.Element("Data").Element("Size").Element("Y").Value),
+                int.Parse(xml.Root.Element("Data").Element("Size").Element("Z").Value)
+            );
         }
 
         return levelInfo;

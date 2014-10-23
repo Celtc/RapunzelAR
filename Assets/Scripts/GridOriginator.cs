@@ -26,15 +26,23 @@ public class GridOriginator
     /// </summary>
     public GridOriginator()
     {
-        this._grid = new Grid();
+        this._grid = new Grid(IntVector3.zero);
     }
 
     /// <summary>
-    /// Limpia la grilla
+    /// Contructor
     /// </summary>
-    public void Clear()
+    public GridOriginator(IntVector3 size)
     {
-        this._grid = new Grid();
+        this._grid = new Grid(size);
+    }
+
+    /// <summary>
+    /// Destruye la grilla actual
+    /// </summary>
+    public void Destroy()
+    {
+        this._grid = null;
     }
 
     /// <summary>
@@ -45,14 +53,14 @@ public class GridOriginator
     {
         // Lista de estados de characters
         var charactersState = new List<CharacterState>();
-        foreach(var character in Level.Grid.AllCharacters)
+        foreach (var character in Level.Instance.Grid.AllCharacters)
         {
             charactersState.Add(character.GetState());
         }
 
         // Lista de estados de bloques
         var blocksState = new List<BlockState>();
-        foreach (var block in Level.Grid.AllBlocks)
+        foreach (var block in Level.Instance.Grid.AllBlocks)
         {
             blocksState.Add(block.GetState());
         }
@@ -68,10 +76,10 @@ public class GridOriginator
     public void SetMemento(GridMemento memento)
     {
         // Destruye todos los objetos
-        Level.Unload();
+        Level.Instance.Clear();
 
         // Carga el memento
-        Level.Load(memento);
+        Level.Instance.Load(memento);
     }
 
 	#endregion

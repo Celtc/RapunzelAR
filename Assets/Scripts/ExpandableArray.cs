@@ -33,17 +33,20 @@ public class ExpandableMatrix<T> where T : class
             octant |= y < 0 ? Octant.NegativeY : Octant.PositiveY;
             octant |= z < 0 ? Octant.NegativeZ : Octant.PositiveZ;
 
-            switch(octant)
+            try
             {
-                case Octant.PositiveX | Octant.PositiveY | Octant.PositiveZ: result = _positives[x, y, z]; break;
-                case Octant.NegativeX | Octant.PositiveY | Octant.PositiveZ: result = _negativesX[-1 - x, y, z]; break;
-                case Octant.PositiveX | Octant.NegativeY | Octant.PositiveZ: result = _negativesY[x, -1 - y, z]; break;
-                case Octant.PositiveX | Octant.PositiveY | Octant.NegativeZ: result = _negativesZ[x, y, -1 - z]; break;
-                case Octant.NegativeX | Octant.NegativeY | Octant.PositiveZ: result = _negativesXY[-1 - x, -1 - y, z]; break;
-                case Octant.NegativeX | Octant.PositiveY | Octant.NegativeZ: result = _negativesXZ[-1 - x, y, -1 - z]; break;
-                case Octant.PositiveX | Octant.NegativeY | Octant.NegativeZ: result = _negativesYZ[x, -1 - y, -1 - z]; break;
-                case Octant.NegativeX | Octant.NegativeY | Octant.NegativeZ: result = _negativesXYZ[-1 - x, -1 - y, -1 - z]; break;
-            }
+                switch (octant)
+                {
+                    case Octant.PositiveX | Octant.PositiveY | Octant.PositiveZ: result = _positives[x, y, z]; break;
+                    case Octant.NegativeX | Octant.PositiveY | Octant.PositiveZ: result = _negativesX[-1 - x, y, z]; break;
+                    case Octant.PositiveX | Octant.NegativeY | Octant.PositiveZ: result = _negativesY[x, -1 - y, z]; break;
+                    case Octant.PositiveX | Octant.PositiveY | Octant.NegativeZ: result = _negativesZ[x, y, -1 - z]; break;
+                    case Octant.NegativeX | Octant.NegativeY | Octant.PositiveZ: result = _negativesXY[-1 - x, -1 - y, z]; break;
+                    case Octant.NegativeX | Octant.PositiveY | Octant.NegativeZ: result = _negativesXZ[-1 - x, y, -1 - z]; break;
+                    case Octant.PositiveX | Octant.NegativeY | Octant.NegativeZ: result = _negativesYZ[x, -1 - y, -1 - z]; break;
+                    case Octant.NegativeX | Octant.NegativeY | Octant.NegativeZ: result = _negativesXYZ[-1 - x, -1 - y, -1 - z]; break;
+                }
+            }catch{};
 
             return result;
         }
@@ -75,6 +78,24 @@ public class ExpandableMatrix<T> where T : class
     public ExpandableMatrix()
     {
         this._positives = new T[0, 0, 0];
+        this._negativesX = new T[0, 0, 0];
+        this._negativesY = new T[0, 0, 0];
+        this._negativesZ = new T[0, 0, 0];
+        this._negativesXY = new T[0, 0, 0];
+        this._negativesXZ = new T[0, 0, 0];
+        this._negativesYZ = new T[0, 0, 0];
+        this._negativesXYZ = new T[0, 0, 0];
+    }
+    
+    public ExpandableMatrix(IntVector3 size)
+    {
+        size = new IntVector3(
+            Mathf.Max(0, size.x),
+            Mathf.Max(0, size.y),
+            Mathf.Max(0, size.z)
+        );
+
+        this._positives = new T[size.x, size.y, size.z];
         this._negativesX = new T[0, 0, 0];
         this._negativesY = new T[0, 0, 0];
         this._negativesZ = new T[0, 0, 0];
@@ -115,7 +136,7 @@ public class ExpandableMatrix<T> where T : class
     private void SetValue(ref T[,,] matrix, int x, int y, int z, T value)
     {
         if (OutOfMatrix(matrix, x, y, z))
-            ResizeToInclude(ref _positives, x, y, z);
+            ResizeToInclude(ref matrix, x, y, z);
 
         matrix[x, y, z] = value;
     }

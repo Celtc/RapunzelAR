@@ -24,7 +24,7 @@ public class BtnTest : MonoBehaviour
 	{
         var parser = new LevelXMLParser(_XML);
         var levelInfo = parser.ToLevelInfo();
-        var levelMemento = parser.ToGridMemento();
+        //var levelMemento = parser.ToGridMemento();
 
         Debug.Log("Leido :\"" + levelInfo.LevelName + "\"");
 	}
